@@ -32,137 +32,125 @@ const Signup = () => {
     confirmPassword.length > 0 && password !== confirmPassword;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-secondary/10 via-base-200 to-primary/10 flex items-center justify-center p-6">
-      <div className="w-full max-w-md">
-        <div className="bg-base-100/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-base-300/50 p-8">
-          <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-secondary/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <FaUserPlus className="text-2xl text-secondary" />
+    <div className="min-h-screen bg-gradient-to-br from-secondary/10 via-base-200 to-primary/10 flex items-center justify-center p-4">
+      <div className="w-full max-w-sm">
+        <div className="bg-base-100/90 backdrop-blur-xl rounded-2xl shadow-xl border border-base-300/50 p-6">
+          <div className="text-center mb-6">
+            <div className="w-12 h-12 bg-secondary/10 rounded-xl flex items-center justify-center mx-auto mb-3">
+              <FaUserPlus className="text-lg text-secondary" />
             </div>
-            <h1 className="text-3xl font-bold text-base-content mb-2">
+            <h1 className="text-2xl font-bold text-base-content mb-1">
               Join Us
             </h1>
-            <p className="text-base-content/60">Create your account</p>
+            <p className="text-sm text-base-content/60">Create your account</p>
           </div>
 
-          <form className="space-y-5">
+          <form className="space-y-4">
             {/* Name Field */}
-            <div>
-              <div className="relative">
-                <div className="absolute top-1/2 left-0 pl-4 -translate-y-1/2 pointer-events-none z-10">
-                  <FaIdCard className="text-base-content/40" />
-                </div>
-                <input
-                  type="text"
-                  placeholder="Full Name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3 bg-base-200/50 border border-base-300/30 rounded-xl text-base-content placeholder:text-base-content/40 focus:outline-none focus:ring-2 focus:ring-secondary/50 focus:border-secondary/50 focus:bg-base-100 transition-all duration-300"
-                  required
-                />
+            <div className="relative">
+              <div className="absolute top-3 left-0 pl-3 pointer-events-none z-10">
+                <FaIdCard className="text-sm text-base-content/40" />
               </div>
+              <input
+                type="text"
+                placeholder="Full Name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full pl-10 pr-3 py-2.5 bg-base-200/50 border border-base-300/30 rounded-lg text-sm text-base-content placeholder:text-base-content/40 focus:outline-none focus:ring-1 focus:ring-secondary/50 focus:border-secondary/50 focus:bg-base-100 transition-all duration-200"
+                required
+              />
               {isNameInvalid && (
-                <p className="text-xs text-orange-500 mt-1 ml-1">
-                  Name too short
-                </p>
+                <p className="text-xs text-orange-500 mt-1 ml-1">Too short</p>
               )}
             </div>
 
             {/* Username Field */}
-            <div>
-              <div className="relative">
-                <div className="absolute top-1/2 left-0 pl-4 -translate-y-1/2 pointer-events-none z-10">
-                  <FaUser className="text-base-content/40" />
-                </div>
-                <input
-                  type="text"
-                  placeholder="Username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3 bg-base-200/50 border border-base-300/30 rounded-xl text-base-content placeholder:text-base-content/40 focus:outline-none focus:ring-2 focus:ring-secondary/50 focus:border-secondary/50 focus:bg-base-100 transition-all duration-300"
-                  required
-                />
+            <div className="relative">
+              <div className="absolute top-3 left-0 pl-3 pointer-events-none z-10">
+                <FaUser className="text-sm text-base-content/40" />
               </div>
+              <input
+                type="text"
+                placeholder="Username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="w-full pl-10 pr-3 py-2.5 bg-base-200/50 border border-base-300/30 rounded-lg text-sm text-base-content placeholder:text-base-content/40 focus:outline-none focus:ring-1 focus:ring-secondary/50 focus:border-secondary/50 focus:bg-base-100 transition-all duration-200"
+                required
+              />
               {isUsernameInvalid && (
                 <p className="text-xs text-orange-500 mt-1 ml-1">
-                  Invalid username format
+                  Invalid format
                 </p>
               )}
             </div>
 
             {/* Password Field */}
-            <div>
-              <div className="relative">
-                <div className="absolute top-1/2 left-0 pl-4 -translate-y-1/2 pointer-events-none z-10">
-                  <FaLock className="text-base-content/40" />
-                </div>
-                <input
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-12 pr-12 py-3 bg-base-200/50 border border-base-300/30 rounded-xl text-base-content placeholder:text-base-content/40 focus:outline-none focus:ring-2 focus:ring-secondary/50 focus:border-secondary/50 focus:bg-base-100 transition-all duration-300"
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={togglePassword}
-                  className="absolute top-1/2 right-0 pr-4 -translate-y-1/2 text-base-content/40 hover:text-base-content transition-colors z-10"
-                >
-                  {showPassword ? <FaEyeSlash /> : <FaEye />}
-                </button>
+            <div className="relative">
+              <div className="absolute top-3 left-0 pl-3 pointer-events-none z-10">
+                <FaLock className="text-sm text-base-content/40" />
               </div>
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full pl-10 pr-10 py-2.5 bg-base-200/50 border border-base-300/30 rounded-lg text-sm text-base-content placeholder:text-base-content/40 focus:outline-none focus:ring-1 focus:ring-secondary/50 focus:border-secondary/50 focus:bg-base-100 transition-all duration-200"
+                required
+              />
+              <button
+                type="button"
+                onClick={togglePassword}
+                className="absolute top-3 right-0 pr-3 text-sm text-base-content/40 hover:text-base-content transition-colors z-10"
+              >
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </button>
               {isPasswordInvalid && (
                 <p className="text-xs text-orange-500 mt-1 ml-1">
-                  Invalid password format
+                  Password: 8+ chars with uppercase, lowercase & number
                 </p>
               )}
             </div>
 
             {/* Confirm Password Field */}
-            <div>
-              <div className="relative">
-                <div className="absolute top-1/2 left-0 pl-4 -translate-y-1/2 pointer-events-none z-10">
-                  <FaLock className="text-base-content/40" />
-                </div>
-                <input
-                  type={showConfirmPassword ? "text" : "password"}
-                  placeholder="Confirm Password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full pl-12 pr-12 py-3 bg-base-200/50 border border-base-300/30 rounded-xl text-base-content placeholder:text-base-content/40 focus:outline-none focus:ring-2 focus:ring-secondary/50 focus:border-secondary/50 focus:bg-base-100 transition-all duration-300"
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={toggleConfirmPassword}
-                  className="absolute top-1/2 right-0 pr-4 -translate-y-1/2 text-base-content/40 hover:text-base-content transition-colors z-10"
-                >
-                  {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
-                </button>
+            <div className="relative">
+              <div className="absolute top-3 left-0 pl-3 pointer-events-none z-10">
+                <FaLock className="text-sm text-base-content/40" />
               </div>
+              <input
+                type={showConfirmPassword ? "text" : "password"}
+                placeholder="Confirm Password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="w-full pl-10 pr-10 py-2.5 bg-base-200/50 border border-base-300/30 rounded-lg text-sm text-base-content placeholder:text-base-content/40 focus:outline-none focus:ring-1 focus:ring-secondary/50 focus:border-secondary/50 focus:bg-base-100 transition-all duration-200"
+                required
+              />
+              <button
+                type="button"
+                onClick={toggleConfirmPassword}
+                className="absolute top-3 right-0 pr-3 text-sm text-base-content/40 hover:text-base-content transition-colors z-10"
+              >
+                {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+              </button>
               {isConfirmPasswordInvalid && (
-                <p className="text-xs text-orange-500 mt-1 ml-1">
-                  Passwords don't match
-                </p>
+                <p className="text-xs text-orange-500 mt-1 ml-1">Don't match</p>
               )}
             </div>
 
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full py-3 bg-gradient-to-r from-secondary to-secondary/80 hover:from-secondary/90 hover:to-secondary text-secondary-content font-semibold rounded-xl transition-all duration-300 transform hover:scale-[1.02] shadow-lg hover:shadow-xl"
+              className="w-full py-2.5 bg-gradient-to-r from-secondary to-secondary/80 hover:from-secondary/90 hover:to-secondary text-secondary-content font-medium rounded-lg transition-all duration-200 transform hover:scale-[1.01] shadow-md hover:shadow-lg text-sm"
             >
               Create Account
             </button>
 
             {/* Divider */}
-            <div className="relative my-6">
+            <div className="relative my-4">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-base-300"></div>
               </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-4 bg-base-100 text-base-content/60">
+              <div className="relative flex justify-center text-xs">
+                <span className="px-3 bg-base-100 text-base-content/60">
                   Already have an account?
                 </span>
               </div>
@@ -171,7 +159,7 @@ const Signup = () => {
             {/* Link to Login */}
             <a
               href="/login"
-              className="w-full py-3 border-2 border-secondary/20 hover:border-secondary/40 text-secondary font-semibold rounded-xl transition-all duration-300 flex items-center justify-center hover:bg-secondary/5"
+              className="w-full py-2.5 border border-secondary/20 hover:border-secondary/40 text-secondary font-medium rounded-lg transition-all duration-200 flex items-center justify-center hover:bg-secondary/5 text-sm"
             >
               Sign In
             </a>
