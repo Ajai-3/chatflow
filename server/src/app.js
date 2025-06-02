@@ -11,6 +11,6 @@ app.use(cors());
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
-app.use("/", userRouter)
+app.use("/api/v1/user", userRouter)
 
 export default app

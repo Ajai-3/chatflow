@@ -59,6 +59,7 @@ const Home = () => {
       unread: 2,
       online: true,
     },
+    
   ];
 
   // Mock messages for selected user
@@ -92,6 +93,7 @@ const Home = () => {
           time: "10:36 AM",
           isMine: true,
         },
+        
       ]
     : [];
 

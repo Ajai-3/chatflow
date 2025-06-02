@@ -1,4 +1,4 @@
-import userModel from "../models/user.model";
+import userModel from "../models/user.model.js";
 
 //=======================================================================================================================
 // USER REGISTRATION
@@ -7,7 +7,8 @@ import userModel from "../models/user.model";
 //=======================================================================================================================
 export const registerUser = async (req, res) => {
     try {
-        
+        // const {fullname, username, password} = req.body
+        res.send("sdf")
     } catch (error) {
         console.log("Internal server error", error)
     }
@@ -18,7 +19,14 @@ export const registerUser = async (req, res) => {
 //=======================================================================================================================
 // This controller is help to login the user if alredy exist
 //=======================================================================================================================
-
+export const loginUser = async (req, res) => {
+    try {
+        // const {username, password} = req.body
+        res.send("sfsdf")
+    } catch (error) {
+        console.log("Internal server error", error)
+    }
+}
 //=======================================================================================================================
 // LOGOUT
 //=======================================================================================================================
