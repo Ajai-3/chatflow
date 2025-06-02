@@ -1,50 +1,14 @@
-import React, { useEffect, useState } from "react";
-
-const themes = [
-  "light",
-  "dark",
-  "cupcake",
-  "bumblebee",
-  "emerald",
-  "corporate",
-  "synthwave",
-  "retro",
-  "cyberpunk",
-  "valentine",
-  "halloween",
-  "forest",
-  "aqua",
-  "luxury",
-  "dracula",
-  "autumn",
-  "business",
-  "acid",
-  "lemonade",
-  "night",
-  "coffee",
-  "winter",
-];
+import React, { useContext } from "react";
+import { FaMoon, FaSun } from "react-icons/fa";
+import { ThemeContext } from "../context/ThemeContext";
 
 const ThemeSwitcher = () => {
-  const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
-
-  useEffect(() => {
-    document.documentElement.setAttribute("data-theme", theme);
-    localStorage.setItem("theme", theme);
-  }, [theme]);
+  const { theme, toggleTheme } = useContext(ThemeContext);
 
   return (
-    <select
-      className="select select-bordered m-4"
-      value={theme}
-      onChange={(e) => setTheme(e.target.value)}
-    >
-      {themes.map((t) => (
-        <option key={t} value={t}>
-          {t}
-        </option>
-      ))}
-    </select>
+    <button className="btn btn-circle text-xl" onClick={toggleTheme}>
+      {theme === "light" ? <FaMoon /> : <FaSun />}
+    </button>
   );
 };
 

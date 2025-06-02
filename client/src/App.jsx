@@ -1,16 +1,19 @@
-import React from "react";
-import ThemeSwitcher from "./components/ThemeSwitcher";
+import React from 'react'
+import { Routes, Route } from 'react-router-dom'
+import Home from './page/Home'
+import Login from './page/Login'
+import Signup from './page/Signup'
 
 const App = () => {
   return (
-    <div className="min-h-screen p-4 bg-base-100 text-base-content">
-      <h1 className="text-3xl font-bold mb-4 text-base-content">
-        🌈 DaisyUI Theme Switcher
-      </h1>
-      <ThemeSwitcher />
-      <button className="btn btn-primary mt-4">Example Button</button>
-    </div>
-  );
-};
+    <>
+    <Routes>
+      <Route path='/' element={<Home />} />
+      <Route path='/login' element={<Login />} />
+      <Route path='/signup' element={<Signup />} />
+    </Routes>
+    </>
+  )
+}
 
-export default App;
+export default App
