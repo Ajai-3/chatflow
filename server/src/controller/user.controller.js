@@ -7,8 +7,19 @@ import userModel from "../models/user.model.js";
 //=======================================================================================================================
 export const registerUser = async (req, res) => {
     try {
-        // const {fullname, username, password} = req.body
-        res.send("sdf")
+        const { fullname, username, password } = req.body
+        console.log(req.body)
+        if (!fullname || !username || !password) {
+            return res.status(400).json("All fiels are required")
+        }
+        const existUsername = await userModel.findOne({ username });
+        if (existUsername) {
+            return res.status(400).json("Username already exists");
+        }
+
+        const user = new userModel({ fullname, username, password });
+        await user.save()
+        return res.status(201).json(user)
     } catch (error) {
         console.log("Internal server error", error)
     }
