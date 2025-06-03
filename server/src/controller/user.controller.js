@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken"
 import userModel from "../models/user.model.js";
 import asyncHandler from '../utilities/asyncHandler.utility.js';
 import { errorHandler } from '../utilities/errorHandler.utility.js';
+import { response } from 'express';
 
 //=======================================================================================================================
 // USER REGISTRATION
@@ -117,6 +118,31 @@ export const getProfile = asyncHandler(async (req, res, next) => {
     });
 });
 
+//=======================================================================================================================
+// GET OTHER USERS
+//=======================================================================================================================
+// This controller is help to get other users
+//=======================================================================================================================
+export const getOtherUsers = asyncHandler(async (req, res, next) => {
+
+    const userId = req.user._id;
+
+    if (!userId) {
+        return next(new errorHandler("User id is not given", 400))
+    }
+
+    const otherUsers = await userModel.find({ _id: {$ne: userId} })
+
+    if (!otherUsers) {
+        return next(new errorHandler("User nto find", 404))
+    }
+
+    return res.status(200).json({
+        success: true,
+        message: "All user fetched",
+        responseData: otherUsers
+    })
+})
 
 
 //=======================================================================================================================
