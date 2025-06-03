@@ -11,16 +11,29 @@ const userSchema = mongoose.Schema({
     required: true,
     unique: true
   },
+  avatar: {
+    type: String,
+    required: true,
+  },
+  gender: {
+    type: String,
+    required: true,
+  },
   password: {
     type: String,
     required: true
   }
 }, { timestamps: true });
 
-userSchema.pre("save", function (next) {
-  if (!this.isModified("password")) return next(); 
-  this.password = bcrypt.hash(this.password, 10); 
-  next();
+userSchema.pre("save", async function (next) {
+  try {
+    if (!this.isModified("password")) return next();
+    const hashedPassword = await bcrypt.hash(this.password, 10);
+    this.password = hashedPassword;
+    next();
+  } catch (error) {
+    next(error);
+  }
 });
 
 
