@@ -1,21 +1,13 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Routes, Route } from "react-router-dom";
-import { useDispatch } from "react-redux";
 import Home from "./page/Home";
 import Login from "./page/authentication/Login";
 import Signup from "./page/authentication/Signup";
 import { Toaster } from "react-hot-toast";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import PublicRoute from "./routes/PublicRoute";
-import { getProfileThunk } from "./store/slice/user.thunk";
 
 const App = () => {
-  const dispatch = useDispatch();
-
-  // Check authentication status on app load
-  useEffect(() => {
-    dispatch(getProfileThunk());
-  }, [dispatch]);
 
   return (
     <>

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { FaUser, FaLock, FaEye, FaEyeSlash, FaSignInAlt } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
-import { loginUserThunk } from "../../store/slice/user.thunk";
+import { loginUserThunk } from "../../store/slice/user/user.thunk";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 

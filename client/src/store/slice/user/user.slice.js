@@ -1,11 +1,13 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { loginUserThunk, signupUserThunk, logoutUserThunk, getProfileThunk } from "./user.thunk";
+import { loginUserThunk, signupUserThunk, logoutUserThunk, getProfileThunk, getChatUsersThunk } from "./user.thunk";
 
 const initialState = {
   isAuthenticated: false,
   user: null,
+  chatUsers: [],
   loading: false,
   screenLoading: true,
+  chatUsersLoading: false,
   error: null,
 };
 
@@ -47,7 +49,7 @@ export const userSlice = createSlice({
       })
       .addCase(getProfileThunk.fulfilled, (state, action) => {
         state.screenLoading = false;
-        state.user = action.payload; 
+        state.user = action.payload;
         state.isAuthenticated = true;
         state.error = null;
       })
@@ -64,11 +66,26 @@ export const userSlice = createSlice({
         state.loading = false;
         state.isAuthenticated = false;
         state.user = null;
+        state.chatUsers = [];
         state.error = null;
       })
       .addCase(logoutUserThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Failed to logout";
+      })
+
+      .addCase(getChatUsersThunk.pending, (state) => {
+        state.chatUsersLoading = true;
+        state.error = null;
+      })
+      .addCase(getChatUsersThunk.fulfilled, (state, action) => {
+        state.chatUsersLoading = false;
+        state.chatUsers = action.payload;
+        state.error = null;
+      })
+      .addCase(getChatUsersThunk.rejected, (state, action) => {
+        state.chatUsersLoading = false;
+        state.error = action.payload || "Failed to load chat users";
       });
   }
 

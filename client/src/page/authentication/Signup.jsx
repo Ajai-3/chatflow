@@ -12,7 +12,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   getAllUsernameThunk,
   signupUserThunk,
-} from "../../store/slice/user.thunk";
+} from "../../store/slice/user/user.thunk";
 import { useNavigate } from "react-router-dom";
 
 const Signup = () => {

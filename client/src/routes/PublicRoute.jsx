@@ -36,13 +36,13 @@ const PublicRoute = ({ children }) => {
     };
   }, [location.pathname, isAuthenticated, screenLoading, navigate]);
 
-  if (screenLoading) {
-    return (
-      <div className="min-h-screen bg-base-100 flex items-center justify-center">
-        <div className="loading loading-spinner loading-lg text-primary"></div>
-      </div>
-    );
-  }
+  // if (screenLoading) {
+  //   return (
+  //     <div className="min-h-screen bg-base-100 flex items-center justify-center">
+  //       <div className="loading loading-spinner loading-lg text-primary"></div>
+  //     </div>
+  //   );
+  // }
 
   if (isAuthenticated) {
     return null;

@@ -1,4 +1,4 @@
-import axiosInstance from "../../api/axiosINstance";
+import axiosInstance from "../../../api/axiosINstance";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
 //=======================================================================================================================
@@ -15,12 +15,12 @@ export const loginUserThunk = createAsyncThunk(
         username,
         password,
       });
-      return response.data.responseData;  
+      return response.data.responseData;
     } catch (error) {
       console.log(error?.response?.data?.errMessage);
-        const message =
+      const message =
         error.response?.data?.errMessage ||
-        error.response?.data?.message ||    
+        error.response?.data?.message ||
         "Login failed. Please try again.";
       return rejectWithValue(message);
     }
@@ -37,11 +37,11 @@ export const getAllUsernameThunk = createAsyncThunk("user/all-usernames", async 
     return responce.data.responseData
   } catch (error) {
     console.log(error?.response?.data?.errMessage);
-        const message =
-        error.response?.data?.errMessage ||
-        error.response?.data?.message ||    
-        "Failed to fetch usernames.";
-      return rejectWithValue(message);
+    const message =
+      error.response?.data?.errMessage ||
+      error.response?.data?.message ||
+      "Failed to fetch usernames.";
+    return rejectWithValue(message);
   }
 })
 
@@ -61,12 +61,12 @@ export const signupUserThunk = createAsyncThunk(
         gender,
         password,
       });
-      return response.data;  
+      return response.data;
     } catch (error) {
       console.log(error?.response?.data?.errMessage);
-        const message =
+      const message =
         error.response?.data?.errMessage ||
-        error.response?.data?.message ||    
+        error.response?.data?.message ||
         "Sign up failed. Please try again.";
       return rejectWithValue(message);
     }
@@ -75,7 +75,7 @@ export const signupUserThunk = createAsyncThunk(
 
 
 //=======================================================================================================================
-//  GET PROFILE THUNL
+//  GET PROFILE THUNK
 //=======================================================================================================================
 // Handles user profile of the logged user
 //=======================================================================================================================
@@ -85,13 +85,37 @@ export const getProfileThunk = createAsyncThunk(
     try {
 
       const response = await axiosInstance.get("/user/profile");
-      return response.data.responseData;  
+      return response.data.responseData;
     } catch (error) {
       console.log(error?.response?.data?.errMessage);
-        const message =
+      const message =
         error.response?.data?.errMessage ||
-        error.response?.data?.message ||    
+        error.response?.data?.message ||
         "Load profile is failed";
+      return rejectWithValue(message);
+    }
+  }
+);
+
+//=======================================================================================================================
+//  GET CHAT USERS THUNK
+//=======================================================================================================================
+// Handles fetching chat users with their last messages
+//=======================================================================================================================
+export const getChatUsersThunk = createAsyncThunk(
+  "user/get-chat-users",
+  async (_, { rejectWithValue }) => {
+    try {
+
+      const response = await axiosInstance.get("/user/get-chat-users");
+      console.log(response.data.responseData)
+      return response.data.responseData;
+    } catch (error) {
+      console.log(error?.response?.data?.errMessage);
+      const message =
+        error.response?.data?.errMessage ||
+        error.response?.data?.message ||
+        "Failed to load chat users";
       return rejectWithValue(message);
     }
   }
@@ -108,12 +132,12 @@ export const logoutUserThunk = createAsyncThunk(
     try {
 
       const response = await axiosInstance.post("/user/logout");
-      return response.data;  
+      return response.data;
     } catch (error) {
       console.log(error?.response?.data?.errMessage);
-        const message =
+      const message =
         error.response?.data?.errMessage ||
-        error.response?.data?.message ||    
+        error.response?.data?.message ||
         "Sign up failed. Please try again.";
       return rejectWithValue(message);
     }

@@ -2,6 +2,7 @@ import React from "react";
 import { FaCircle, FaPhone, FaVideo, FaEllipsisV } from "react-icons/fa";
 
 const ChatHeader = ({ selectedUser }) => {
+
   return (
     <div className="p-4 border-b border-base-300 bg-base-100">
       <div className="flex items-center justify-between">
@@ -10,21 +11,21 @@ const ChatHeader = ({ selectedUser }) => {
             <div className="w-10 h-10 rounded-full bg-base-300 overflow-hidden">
               <img
                 src={selectedUser.avatar}
-                alt={selectedUser.name}
+                alt={selectedUser.fullname}
                 className="w-full h-full object-cover"
                 onError={(e) => {
                   e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedUser.name)}&background=random`;
                 }}
               />
             </div>
-            {selectedUser.online && (
+            {selectedUser?.online && (
               <FaCircle className="absolute -bottom-1 -right-1 text-green-500 text-xs bg-base-100 rounded-full" />
             )}
           </div>
           <div>
-            <h2 className="font-semibold text-base-content">{selectedUser.name}</h2>
+            <h2 className="font-semibold text-base-content">{selectedUser.fullname}</h2>
             <p className="text-sm text-base-content/60">
-              {selectedUser.online ? "Online" : "Last seen recently"}
+              {selectedUser?.online ? "Online" : "Last seen recently"}
             </p>
           </div>
         </div>
