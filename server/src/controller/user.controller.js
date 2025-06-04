@@ -120,9 +120,7 @@ export const getProfile = asyncHandler(async (req, res, next) => {
     return res.status(200).json({
         success: true,
         message: "User profile fetched successfully",
-        responceData: {
-            profile
-        }
+        responseData: profile
     });
 });
 
