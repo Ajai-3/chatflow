@@ -11,14 +11,10 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
-  const { isAuthenticated } = useSelector((state) => state.user);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (isAuthenticated) navigate("/")
-  }, [isAuthenticated])
 
   const togglePassword = () => setShowPassword((prev) => !prev);
 

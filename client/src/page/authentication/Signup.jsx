@@ -24,7 +24,6 @@ const Signup = () => {
   const [gender, setGender] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const { isAuthenticated } = useSelector((state) => state.user);
   const [allUsernames, setAllUsernames] = useState([]);
 
   const [errors, setErrors] = useState({});
@@ -34,9 +33,6 @@ const Signup = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (isAuthenticated) navigate("/");
-  }, [isAuthenticated]);
 
   useEffect(() => {
     dispatch(getAllUsernameThunk())

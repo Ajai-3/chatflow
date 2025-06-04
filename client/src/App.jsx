@@ -1,15 +1,25 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import Home from "./page/Home";
 import Login from "./page/authentication/Login";
 import Signup from "./page/authentication/Signup";
 import { Toaster } from "react-hot-toast";
 import ProtectedRoute from "./routes/ProtectedRoute";
+import PublicRoute from "./routes/PublicRoute";
+import { getProfileThunk } from "./store/slice/user.thunk";
 
 const App = () => {
+  const dispatch = useDispatch();
+
+  // Check authentication status on app load
+  useEffect(() => {
+    dispatch(getProfileThunk());
+  }, [dispatch]);
+
   return (
     <>
-   <Toaster
+      <Toaster
         position="top-center"
         toastOptions={{
           duration: 2000,
@@ -21,9 +31,30 @@ const App = () => {
         }}
       />
       <Routes>
-       <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <Home />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/login"
+          element={
+            <PublicRoute>
+              <Login />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/signup"
+          element={
+            <PublicRoute>
+              <Signup />
+            </PublicRoute>
+          }
+        />
       </Routes>
     </>
   );
