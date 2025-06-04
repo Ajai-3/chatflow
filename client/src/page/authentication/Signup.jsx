@@ -8,7 +8,7 @@ import {
   FaIdCard,
 } from "react-icons/fa";
 import toast from "react-hot-toast";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   getAllUsernameThunk,
   signupUserThunk,
@@ -24,7 +24,7 @@ const Signup = () => {
   const [gender, setGender] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-
+  const { isAuthenticated } = useSelector((state) => state.user);
   const [allUsernames, setAllUsernames] = useState([]);
 
   const [errors, setErrors] = useState({});
@@ -32,7 +32,11 @@ const Signup = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const dispatch = useDispatch();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isAuthenticated) navigate("/");
+  }, [isAuthenticated]);
 
   useEffect(() => {
     dispatch(getAllUsernameThunk())
@@ -61,9 +65,7 @@ const Signup = () => {
     if (!gender) newErrors.gender = "Please select your gender";
 
     if (!password) newErrors.password = "Password is required";
-    else if (
-      !/(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}/.test(password)
-    )
+    else if (!/(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}/.test(password))
       newErrors.password =
         "Password must be 8+ chars with upper, lower & number";
 
@@ -101,7 +103,7 @@ const Signup = () => {
         setPassword("");
         setConfirmPassword("");
         setErrors({});
-        navigate("/login")
+        navigate("/login");
         toast.success("Account created successfully! Login now");
       } else {
         toast.error(resultAction.payload || "Signup failed");
@@ -166,8 +168,7 @@ const Signup = () => {
 
       if (confirmPassword && val !== confirmPassword)
         newErrors.confirmPassword = "Passwords do not match";
-      else if (confirmPassword)
-        delete newErrors.confirmPassword;
+      else if (confirmPassword) delete newErrors.confirmPassword;
 
       return newErrors;
     });
@@ -179,7 +180,8 @@ const Signup = () => {
     setErrors((prev) => {
       const newErrors = { ...prev };
       if (!val) newErrors.confirmPassword = "Please confirm your password";
-      else if (password !== val) newErrors.confirmPassword = "Passwords do not match";
+      else if (password !== val)
+        newErrors.confirmPassword = "Passwords do not match";
       else delete newErrors.confirmPassword;
       return newErrors;
     });
@@ -193,7 +195,9 @@ const Signup = () => {
             <div className="w-12 h-12 bg-secondary/10 rounded-xl flex items-center justify-center mx-auto mb-3">
               <FaUserPlus className="text-lg text-secondary" />
             </div>
-            <h1 className="text-2xl font-bold text-base-content mb-1">Join Us</h1>
+            <h1 className="text-2xl font-bold text-base-content mb-1">
+              Join Us
+            </h1>
             <p className="text-sm text-base-content/60">Create your account</p>
           </div>
 
@@ -238,7 +242,9 @@ const Signup = () => {
                 autoComplete="username"
               />
               {errors.username && (
-                <p className="text-xs text-red-600 mt-1 ml-1">{errors.username}</p>
+                <p className="text-xs text-red-600 mt-1 ml-1">
+                  {errors.username}
+                </p>
               )}
             </div>
 
@@ -307,7 +313,9 @@ const Signup = () => {
                 {showPassword ? <FaEyeSlash /> : <FaEye />}
               </button>
               {errors.password && (
-                <p className="text-xs text-red-600 mt-1 ml-1">{errors.password}</p>
+                <p className="text-xs text-red-600 mt-1 ml-1">
+                  {errors.password}
+                </p>
               )}
             </div>
 

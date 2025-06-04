@@ -109,15 +109,15 @@ const UsersList = ({
         ))}
       </div>
       <div
-        key={currentUser.id}
+        key={currentUser?.id}
         className="p-4 flex justify-between items-center border-t border-amber-50"
       >
         <div className="flex items-center gap-3">
           <div className="relative">
             <div className="w-12 h-12 rounded-full bg-base-300 overflow-hidden">
               <img
-                src={currentUser.avatar}
-                alt={currentUser.fullname}
+                src={currentUser?.avatar}
+                alt={currentUser?.fullname}
                 className="w-full h-full object-cover"
               />
             </div>
@@ -127,10 +127,10 @@ const UsersList = ({
           <div className="flex justify-between items-center">
             <div>
               <h3 className="font-medium text-base-content truncate">
-                {currentUser.fullname}
+                {currentUser?.fullname}
               </h3>
               <h3 className="truncate text-gray-500">
-                @{currentUser.username}
+                @{currentUser?.username}
               </h3>
             </div>
           </div>

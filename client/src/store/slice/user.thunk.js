@@ -73,6 +73,30 @@ export const signupUserThunk = createAsyncThunk(
   }
 );
 
+
+//=======================================================================================================================
+//  GET PROFILE THUNL
+//=======================================================================================================================
+// Handles user profile of the logged user
+//=======================================================================================================================
+export const getProfileThunk = createAsyncThunk(
+  "user/profile",
+  async (_, { rejectWithValue }) => {
+    try {
+
+      const response = await axiosInstance.get("/user/profile");
+      return response.data.responseData;  
+    } catch (error) {
+      console.log(error?.response?.data?.errMessage);
+        const message =
+        error.response?.data?.errMessage ||
+        error.response?.data?.message ||    
+        "Load profile is failed";
+      return rejectWithValue(message);
+    }
+  }
+);
+
 //=======================================================================================================================
 //  LOG OUT USRE
 //=======================================================================================================================

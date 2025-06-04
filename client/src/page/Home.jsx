@@ -1,16 +1,22 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import UsersList from "../components/chat/UsersList";
 import ChatArea from "../components/chat/ChatArea";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { getProfileThunk } from "../store/slice/user.thunk";
 
 const Home = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [message, setMessage] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+  
+  const dispatch = useDispatch();
 
-  const currentUser = useSelector((state) => state.user.user)
+  useEffect(() => {
+    dispatch(getProfileThunk());
+  }, [dispatch]);
 
-  console.log(currentUser)
+  const currentUser = useSelector((state) => state.user.user);
+
 
   // Mock data for users
   const users = [

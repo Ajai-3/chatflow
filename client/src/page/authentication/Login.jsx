@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaUser, FaLock, FaEye, FaEyeSlash, FaSignInAlt } from "react-icons/fa";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { loginUserThunk } from "../../store/slice/user.thunk";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -11,9 +11,14 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const { isAuthenticated } = useSelector((state) => state.user);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isAuthenticated) navigate("/")
+  }, [isAuthenticated])
 
   const togglePassword = () => setShowPassword((prev) => !prev);
 
@@ -64,7 +69,7 @@ const Login = () => {
         setPassword("");
         setUsername("");
         navigate("/");
-        toast.success("Login successfull.")
+        toast.success("Login successfull.");
       } else {
         toast.error(resultAction.payload || "Login failed");
       }
@@ -109,7 +114,9 @@ const Login = () => {
                 disabled={isLoading}
               />
               {errors.username && (
-                <p className="text-xs text-red-600 mt-1 ml-1">{errors.username}</p>
+                <p className="text-xs text-red-600 mt-1 ml-1">
+                  {errors.username}
+                </p>
               )}
             </div>
 
@@ -138,7 +145,9 @@ const Login = () => {
                 {showPassword ? <FaEyeSlash /> : <FaEye />}
               </button>
               {errors.password && (
-                <p className="text-xs text-red-600 mt-1 ml-1">{errors.password}</p>
+                <p className="text-xs text-red-600 mt-1 ml-1">
+                  {errors.password}
+                </p>
               )}
             </div>
 
