@@ -37,6 +37,6 @@ userSchema.pre("save", async function (next) {
 });
 
 
-const userModel = mongoose.model("user", userSchema);
+const userModel = mongoose.model("User", userSchema);
 
 export default userModel;

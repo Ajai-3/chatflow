@@ -1,9 +1,9 @@
 import bcrypt from 'bcrypt';
 import jwt from "jsonwebtoken"
 import userModel from "../models/user.model.js";
+import conversationModel from "../models/conversation.model.js";
 import asyncHandler from '../utilities/asyncHandler.utility.js';
 import { errorHandler } from '../utilities/errorHandler.utility.js';
-import { response } from 'express';
 
 //=======================================================================================================================
 // USER REGISTRATION
@@ -32,13 +32,13 @@ export const registerUser = asyncHandler(async (req, res, next) => {
     });
     await user.save();
 
-   return res
-    .status(201)
-    .json({
-        success: true,
-        message: "User registered successfully",
-        responseData: user
-    });
+    return res
+        .status(201)
+        .json({
+            success: true,
+            message: "User registered successfully",
+            responseData: user
+        });
 });
 //=======================================================================================================================
 // USER LOGIN
@@ -67,27 +67,27 @@ export const loginUser = asyncHandler(async (req, res, next) => {
     }
 
     const token = jwt.sign(tokenData, process.env.JWT_SECRET, {
-    expiresIn: "2d"
+        expiresIn: "2d"
     })
 
-   return res
-    .status(200)
-    .cookie("token", token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production", 
-        sameSite: "strict", 
-        maxAge: 2 * 24 * 60 * 60 * 1000 
-    }).json({
-        success: true,
-        message: "Login successful",
-        responseData: user
-    });
+    return res
+        .status(200)
+        .cookie("token", token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+            maxAge: 2 * 24 * 60 * 60 * 1000
+        }).json({
+            success: true,
+            message: "Login successful",
+            responseData: user
+        });
 });
 
 //=======================================================================================================================
 // GET ALL USER NAMES
 //=======================================================================================================================
-// This controller is help to get all user names, it is used in frondend to check the name is already exist or not is 
+// This controller is help to get all user names, it is used in frondend to check the name is already exist or not is
 // not exist then only that request recive in backend
 //=======================================================================================================================
 export const getAllUsernames = asyncHandler(async (req, res, next) => {
@@ -129,7 +129,7 @@ export const getProfile = asyncHandler(async (req, res, next) => {
 //=======================================================================================================================
 // This controller is help to get other users
 //=======================================================================================================================
-export const getOtherUsers = asyncHandler(async (req, res, next) => {
+export const getChatUsers = asyncHandler(async (req, res, next) => {
 
     const userId = req.user._id;
 
@@ -137,18 +137,50 @@ export const getOtherUsers = asyncHandler(async (req, res, next) => {
         return next(new errorHandler("User id is not given", 400))
     }
 
-    const otherUsers = await userModel.find({ _id: {$ne: userId} })
+    const conversations = await conversationModel
+        .find({ participants: userId })
+        .populate("participants", "_id fullname username avatar")
+        .populate({
+            path: "messages",
+            populate: [
+                { path: "senderId", select: "username avatar" },
+                { path: "receiverId", select: "username avatar" }
+            ],
+            options: { sort: { createdAt: -1 } }
+        });
 
-    if (!otherUsers) {
-        return next(new errorHandler("User nto find", 404))
+
+    if (!conversations || conversations.length === 0) {
+        return next(new errorHandler("No conversation found", 404));
     }
 
-    return res.status(200).json({
+    const results = [];
+
+    conversations.forEach(conv => {
+        const otherUser = conv.participants.find(p => p._id.toString() !== userId.toString());
+        if (!otherUser) return;
+
+        const lastMessage = conv.messages.length > 0 ? conv.messages[0] : null;
+
+        results.push({
+            user: otherUser,
+            lastMessage: lastMessage
+                ? {
+                    text: lastMessage.message,
+                    createdAt: lastMessage.createdAt,
+                    senderId: lastMessage.senderId._id,
+                    isFromMe: lastMessage.senderId._id.toString() === userId.toString()
+                }
+                : null,
+        });
+    });
+
+    res.status(200).json({
         success: true,
-        message: "All user fetched",
-        responseData: otherUsers
-    })
-})
+        message: "Chatted users with last message fetched",
+        responseData: results,
+    });
+});
 
 
 //=======================================================================================================================
