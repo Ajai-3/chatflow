@@ -6,13 +6,14 @@ import {
   getChatUsersThunk,
   getProfileThunk,
 } from "../store/slice/user/user.thunk";
+import { sendMessageThunk } from "../store/slice/message/message.thunk";
 
 const Home = () => {
-  const [selectedUser, setSelectedUser] = useState(null);
   const [message, setMessage] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
 
   const dispatch = useDispatch();
+  const selectedUser = useSelector((state) => state.user.selectedUser)
 
   useEffect(() => {
     dispatch(getProfileThunk());
@@ -22,45 +23,16 @@ const Home = () => {
   const currentUser = useSelector((state) => state.user.user);
   const usersWithLastMessage = useSelector((state) => state.user.chatUsers)
 
-
-  // Mock messages for selected user
-  const messages = selectedUser
-    ? [
-        {
-          id: 1,
-          text: "Hey! How are you doing?",
-          sender: selectedUser.id,
-          time: "10:30 AM",
-          isMine: false,
-        },
-        {
-          id: 2,
-          text: "I'm doing great! Thanks for asking. How about you?",
-          sender: "me",
-          time: "10:32 AM",
-          isMine: true,
-        },
-        {
-          id: 3,
-          text: "I'm good too! Working on some exciting projects",
-          sender: selectedUser.id,
-          time: "10:35 AM",
-          isMine: false,
-        },
-        {
-          id: 4,
-          text: "That sounds awesome! Would love to hear more about it",
-          sender: "me",
-          time: "10:36 AM",
-          isMine: true,
-        },
-      ]
-    : [];
+  const messages = useSelector((state) => state.message.messages)
 
   const handleSendMessage = (e) => {
     e.preventDefault();
+    console.log(selectedUser._id)
+
     if (message.trim() && selectedUser) {
-      console.log("Sending message:", message, "to user:", selectedUser.name);
+      let receiverId = selectedUser._id
+      dispatch(sendMessageThunk({ receiverId, message }))
+      console.log("Sending message:", message, "to user:", selectedUser.fullname);
       setMessage("");
     }
   };
@@ -69,9 +41,8 @@ const Home = () => {
     <div className="h-screen bg-base-100 flex">
       <UsersList
         usersWithLastMessage={usersWithLastMessage}
-        currentUser={currentUser}
         selectedUser={selectedUser}
-        setSelectedUser={setSelectedUser}
+        currentUser={currentUser}
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
       />

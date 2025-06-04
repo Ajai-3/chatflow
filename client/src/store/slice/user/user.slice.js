@@ -6,6 +6,7 @@ const initialState = {
   user: null,
   chatUsers: [],
   loading: false,
+  selectedUser: null,
   screenLoading: true,
   chatUsersLoading: false,
   error: null,
@@ -14,6 +15,11 @@ const initialState = {
 export const userSlice = createSlice({
   name: "user",
   initialState,
+  reducers: {
+     setSelectUser: (state, action) => {
+        state.selectedUser = action.payload
+     }
+  },
   extraReducers: (builder) => {
     builder
       .addCase(loginUserThunk.pending, (state) => {
@@ -67,6 +73,7 @@ export const userSlice = createSlice({
         state.isAuthenticated = false;
         state.user = null;
         state.chatUsers = [];
+        state.selectedUser = null;
         state.error = null;
       })
       .addCase(logoutUserThunk.rejected, (state, action) => {
@@ -91,5 +98,5 @@ export const userSlice = createSlice({
 
 });
 
-export const { logout } = userSlice.actions;
+export const { setSelectUser } = userSlice.actions;
 export default userSlice.reducer;

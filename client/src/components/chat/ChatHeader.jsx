@@ -1,8 +1,8 @@
 import React from "react";
 import { FaCircle, FaPhone, FaVideo, FaEllipsisV } from "react-icons/fa";
 
-const ChatHeader = ({ selectedUser }) => {
 
+const ChatHeader = ({ selectedUser }) => {
   return (
     <div className="p-4 border-b border-base-300 bg-base-100">
       <div className="flex items-center justify-between">

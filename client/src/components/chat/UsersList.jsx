@@ -5,12 +5,12 @@ import { useDispatch } from "react-redux";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { logoutUserThunk } from "../../store/slice/user/user.thunk";
+import { setSelectUser } from "../../store/slice/user/user.slice";
 
 const UsersList = ({
+  selectedUser,
   usersWithLastMessage,
   currentUser,
-  selectedUser,
-  setSelectedUser,
   searchTerm,
   setSearchTerm,
 }) => {
@@ -19,10 +19,15 @@ const UsersList = ({
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
+
   const handleLogout = async () => {
     dispatch(logoutUserThunk())
     toast.success("Logout successfull")
     navigate("/login");
+  }
+
+  const handleSelectUser = (user) => {
+    dispatch(setSelectUser(user))
   }
 
 
@@ -55,10 +60,10 @@ const UsersList = ({
       <div className="flex-1 overflow-y-auto">
         {usersWithLastMessage?.map((user) => (
           <div
-            key={user?.id}
-            onClick={() => setSelectedUser(user)}
+            key={user?._id}
+            onClick={() => handleSelectUser(user)}
             className={`p-4 border-b border-base-300/50 cursor-pointer hover:bg-base-300/50 transition-colors ${
-              selectedUser?.id === user.id
+              selectedUser?._id === user._id
                 ? "bg-primary/10 border-l-4 border-l-primary"
                 : ""
             }`}

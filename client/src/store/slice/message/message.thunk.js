@@ -2,18 +2,17 @@ import axiosInstance from "../../../api/axiosINstance";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
 //=======================================================================================================================
-//  LOGINUSERTHUNK
+//  SEND MESSAGE THUNK
 //=======================================================================================================================
-// Handles user login by sending credentials to the server and returning the response data or error.
+// Handles user to send message.
 //=======================================================================================================================
-export const loginUserThunk = createAsyncThunk(
-  "user/login",
-  async ({ username, password }, { rejectWithValue }) => {
+export const sendMessageThunk = createAsyncThunk(
+  "message/send",
+  async ({ receiverId, message }, { rejectWithValue }) => {
     try {
 
-      const response = await axiosInstance.post("/user/login", {
-        username,
-        password,
+      const response = await axiosInstance.post(`/message/send/${receiverId}`, {
+        message
       });
       return response.data.responseData;
     } catch (error) {
@@ -21,15 +20,37 @@ export const loginUserThunk = createAsyncThunk(
       const message =
         error.response?.data?.errMessage ||
         error.response?.data?.message ||
-        "Login failed. Please try again.";
+        "Sending message failed";
       return rejectWithValue(message);
     }
   }
 );
+
 //=======================================================================================================================
-//  GET ALL USERNAMES THUNK
+// GET MESSAGE THUNK
 //=======================================================================================================================
-// This will get all user names to check if the user name alredy exist or not.
+// Handles user to get messages.
+//=======================================================================================================================
+export const getMessageThunk = createAsyncThunk(
+  "message/get-messages",
+  async ({ recieverId }, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get(`/message/get-messages/${recieverId}`);
+      return response.data.responseData;
+    } catch (error) {
+      const message =
+        error.response?.data?.errMessage ||
+        error.response?.data?.message ||
+        "Fetching messages failed";
+      return rejectWithValue(message);
+    }
+  }
+);
+
+//=======================================================================================================================
+//  GET ALL MESSAGES THUNK
+//=======================================================================================================================
+// This will get all meeages with that user.
 //=======================================================================================================================
 export const getAllUsernameThunk = createAsyncThunk("user/all-usernames", async (_, { rejectWithValue }) => {
   try {
@@ -44,6 +65,7 @@ export const getAllUsernameThunk = createAsyncThunk("user/all-usernames", async 
     return rejectWithValue(message);
   }
 })
+
 
 //=======================================================================================================================
 //  SIGNUPUSERTHUNK

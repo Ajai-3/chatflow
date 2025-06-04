@@ -5,18 +5,19 @@ import MessageInput from "./MessageInput";
 import EmptyChat from "./EmptyChat";
 
 const ChatArea = ({ 
-  selectedUser, 
+  selectedUser,
   messages, 
   message, 
   setMessage, 
   handleSendMessage 
 }) => {
+// console.log(selectedUser)
   return (
     <div className="flex-1 flex flex-col">
       {selectedUser ? (
         <>
           <ChatHeader selectedUser={selectedUser} />
-          <MessagesList messages={messages} />
+          <MessagesList messages={messages} selectedUser={selectedUser} />
           <MessageInput 
             message={message}
             setMessage={setMessage}
