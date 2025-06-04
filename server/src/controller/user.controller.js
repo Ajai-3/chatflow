@@ -20,7 +20,7 @@ export const registerUser = asyncHandler(async (req, res, next) => {
 
     const existUsername = await userModel.findOne({ username });
     if (existUsername) {
-        return next(new errorHandler("User already exists", 400));
+        return next(new errorHandler("User name already exists", 400));
     }
 
     const avatarType = gender === "male" ? "boy" : "girl"
@@ -32,33 +32,14 @@ export const registerUser = asyncHandler(async (req, res, next) => {
     });
     await user.save();
 
-    const tokenData = {
-        _id: user?._id
-    }
-
-    const token = jwt.sign(tokenData, process.env.JWT_SECRET, {
-    expiresIn: "2d"
-    })
-
    return res
     .status(201)
-    .cookie("token", token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production", 
-        sameSite: "strict", 
-        maxAge: 2 * 24 * 60 * 60 * 1000 
-    })
     .json({
         success: true,
         message: "User registered successfully",
-        responseData: {
-            user
-        }
+        responseData: user
     });
 });
-
-
-
 //=======================================================================================================================
 // USER LOGIN
 //=======================================================================================================================
@@ -81,15 +62,42 @@ export const loginUser = asyncHandler(async (req, res, next) => {
         return next(new errorHandler("Invalid credentials", 401));
     }
 
-    return res.status(200).json({
+    const tokenData = {
+        _id: user?._id
+    }
+
+    const token = jwt.sign(tokenData, process.env.JWT_SECRET, {
+    expiresIn: "2d"
+    })
+
+   return res
+    .status(200)
+    .cookie("token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production", 
+        sameSite: "strict", 
+        maxAge: 2 * 24 * 60 * 60 * 1000 
+    }).json({
         success: true,
         message: "Login successful",
-        responseData: {
-            user
-        }
+        responseData: user
     });
 });
 
+//=======================================================================================================================
+// GET ALL USER NAMES
+//=======================================================================================================================
+// This controller is help to get all user names, it is used in frondend to check the name is already exist or not is 
+// not exist then only that request recive in backend
+//=======================================================================================================================
+export const getAllUsernames = asyncHandler(async (req, res, next) => {
+    const users = await userModel.find({}, { username: 1, _id: 0 })
+    if (!users) {
+        return next(new errorHandler("Faild to fetch user names.", 404))
+    }
+    let usernames = users.map((user) => user.username)
+    return res.status(200).json({ success: true, message: "All user name fetched sucessfully.", responseData: usernames })
+})
 
 //=======================================================================================================================
 // USER PROFILE

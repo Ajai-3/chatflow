@@ -6,15 +6,19 @@ import asyncHandler from "../utilities/asyncHandler.utility.js";
 //=======================================================================================================================
 // This middleware checks if the user is authenticated via a valid JWT token stored in cookies.
 //=======================================================================================================================
-
 export const isAuthenticated = asyncHandler(async (req, res, next) => {
-    const token = req.cookies.token;
+  const token = req.cookies?.token;
 
-    if (!token) {
-        return next(new errorHandler("Invalid token", 400));
-    }
+  if (!token) {
+    return next(new errorHandler("Unauthorized. Token missing", 401));
+  }
 
-    const tokenData = jwt.verify(token, process.env.JWT_SECRET); 
+  try {
+    const tokenData = jwt.verify(token, process.env.JWT_SECRET);
     req.user = tokenData;
     next();
+  } catch (error) {
+    return next(new errorHandler("Unauthorized. Invalid or expired token", 401));
+  }
 });
+

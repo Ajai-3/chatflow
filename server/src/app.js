@@ -9,9 +9,13 @@ import userRouter from "./routes/user.routes.js"
 import messageRoute from "./routes/message.routes.js"
 import { errorMiddleware } from "./middleware/error.middleware.js"
 
-
-app.use(cors());
 app.use(cookieParser())
+app.use(cors({
+    origin: [process.env.CLIENT_URL],
+    credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE']
+}));
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
