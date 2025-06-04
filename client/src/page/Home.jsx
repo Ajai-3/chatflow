@@ -1,12 +1,16 @@
 import React, { useState } from "react";
-import { Toaster } from "react-hot-toast";
 import UsersList from "../components/chat/UsersList";
 import ChatArea from "../components/chat/ChatArea";
+import { useSelector } from "react-redux";
 
 const Home = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [message, setMessage] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+
+  const currentUser = useSelector((state) => state.user.user)
+
+  console.log(currentUser)
 
   // Mock data for users
   const users = [
@@ -109,6 +113,7 @@ const Home = () => {
     <div className="h-screen bg-base-100 flex">
       <UsersList
         users={users}
+        currentUser={currentUser}
         selectedUser={selectedUser}
         setSelectedUser={setSelectedUser}
         searchTerm={searchTerm}
@@ -123,17 +128,7 @@ const Home = () => {
         handleSendMessage={handleSendMessage}
       />
 
-      <Toaster
-        position="top-center"
-        toastOptions={{
-          duration: 2000,
-          style: {
-            background: "var(--fallback-b1,oklch(var(--b1)))",
-            color: "var(--fallback-bc,oklch(var(--bc)))",
-            border: "1px solid var(--fallback-b3,oklch(var(--b3)))",
-          },
-        }}
-      />
+      
     </div>
   );
 };

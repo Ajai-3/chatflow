@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   FaUser,
   FaLock,
@@ -7,114 +7,182 @@ import {
   FaUserPlus,
   FaIdCard,
 } from "react-icons/fa";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
+import { useDispatch } from "react-redux";
+import {
+  getAllUsernameThunk,
+  signupUserThunk,
+} from "../../store/slice/user.thunk";
+import { useNavigate } from "react-router-dom";
 
 const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
+  const [gender, setGender] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
+  const [allUsernames, setAllUsernames] = useState([]);
+
+  const [errors, setErrors] = useState({});
+
   const [isLoading, setIsLoading] = useState(false);
 
-  const togglePassword = () => setShowPassword((prev) => !prev);
-  const toggleConfirmPassword = () => setShowConfirmPassword((prev) => !prev);
+  const dispatch = useDispatch();
+  const navigate = useNavigate()
 
-  // Validation functions
-  const isNameEmpty = name.trim().length === 0;
-  const isUsernameEmpty = username.trim().length === 0;
-  const isPasswordEmpty = password.trim().length === 0;
-  const isConfirmPasswordEmpty = confirmPassword.trim().length === 0;
+  useEffect(() => {
+    dispatch(getAllUsernameThunk())
+      .unwrap()
+      .then((usernames) => setAllUsernames(usernames))
+      .catch(() => setAllUsernames([]));
+    return () => setAllUsernames([]);
+  }, [dispatch]);
 
-  const isNameInvalid = name.length > 0 && name.trim().length < 2;
+  const validateAll = () => {
+    const newErrors = {};
 
-  const isUsernameInvalid =
-    username.length > 0 &&
-    !/^[A-Za-z][A-Za-z0-9-]{2,29}$/.test(username.trim());
+    if (!name.trim()) newErrors.name = "Full name is required";
+    else if (!/^[A-Za-z\s]+$/.test(name.trim()))
+      newErrors.name = "Full name can contain alphabets and spaces only";
+    else if (name.trim().length < 2)
+      newErrors.name = "Full name must be at least 2 characters";
 
-  const isPasswordInvalid =
-    password.length > 0 &&
-    !/(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}/.test(password);
+    if (!username.trim()) newErrors.username = "Username is required";
+    else if (!/^[A-Za-z_][A-Za-z0-9_]{2,29}$/.test(username.trim()))
+      newErrors.username =
+        "Username must start with a letter/underscore, 3–30 chars";
+    else if (allUsernames.includes(username.trim()))
+      newErrors.username = "Username already exists";
 
-  const isConfirmPasswordInvalid =
-    confirmPassword.length > 0 && password !== confirmPassword;
+    if (!gender) newErrors.gender = "Please select your gender";
+
+    if (!password) newErrors.password = "Password is required";
+    else if (
+      !/(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}/.test(password)
+    )
+      newErrors.password =
+        "Password must be 8+ chars with upper, lower & number";
+
+    if (!confirmPassword)
+      newErrors.confirmPassword = "Please confirm your password";
+    else if (confirmPassword !== password)
+      newErrors.confirmPassword = "Passwords do not match";
+
+    setErrors(newErrors);
+
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Trim values
-    const trimmedName = name.trim();
-    const trimmedUsername = username.trim();
-    const trimmedPassword = password.trim();
-    const trimmedConfirmPassword = confirmPassword.trim();
-
-    // Check for empty fields
-    if (isNameEmpty) {
-      toast.error("Full name is required");
-      return;
-    }
-
-    if (isUsernameEmpty) {
-      toast.error("Username is required");
-      return;
-    }
-
-    if (isPasswordEmpty) {
-      toast.error("Password is required");
-      return;
-    }
-
-    if (isConfirmPasswordEmpty) {
-      toast.error("Please confirm your password");
-      return;
-    }
-
-    // Check for invalid formats
-    if (trimmedName.length < 2) {
-      toast.error("Name must be at least 2 characters long");
-      return;
-    }
-
-    if (!/^[A-Za-z][A-Za-z0-9-]{2,29}$/.test(trimmedUsername)) {
-      toast.error(
-        "Username must be 3-30 characters (letters, numbers, dashes only)"
-      );
-      return;
-    }
-
-    if (!/(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}/.test(trimmedPassword)) {
-      toast.error(
-        "Password: 8+ chars with uppercase, lowercase & number"
-      );
-      return;
-    }
-
-    if (trimmedPassword !== trimmedConfirmPassword) {
-      toast.error("Passwords do not match");
-      return;
-    }
+    if (!validateAll()) return;
 
     setIsLoading(true);
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      const resultAction = await dispatch(
+        signupUserThunk({
+          fullname: name.trim(),
+          username: username.trim(),
+          gender,
+          password: password.trim(),
+        })
+      );
 
-      // Success
-      toast.success("Account created successfully!");
-      console.log("Signup data:", {
-        name: trimmedName,
-        username: trimmedUsername,
-        password: trimmedPassword,
-      });
-
-      // Here you would typically redirect or update app state
-    } catch (error) {
+      if (signupUserThunk.fulfilled.match(resultAction)) {
+        setName("");
+        setUsername("");
+        setGender("");
+        setPassword("");
+        setConfirmPassword("");
+        setErrors({});
+        navigate("/login")
+        toast.success("Account created successfully! Login now");
+      } else {
+        toast.error(resultAction.payload || "Signup failed");
+      }
+    } catch {
       toast.error("Account creation failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleNameChange = (e) => {
+    setName(e.target.value);
+    setErrors((prev) => {
+      const newErrors = { ...prev };
+      if (!e.target.value.trim()) newErrors.name = "Full name is required";
+      else if (!/^[A-Za-z\s]+$/.test(e.target.value.trim()))
+        newErrors.name = "Full name can contain alphabets and spaces only";
+      else if (e.target.value.trim().length < 2)
+        newErrors.name = "Full name must be at least 2 characters";
+      else delete newErrors.name;
+      return newErrors;
+    });
+  };
+
+  const handleUsernameChange = (e) => {
+    const val = e.target.value;
+    setUsername(val);
+    setErrors((prev) => {
+      const newErrors = { ...prev };
+      if (!val.trim()) newErrors.username = "Username is required";
+      else if (!/^[A-Za-z_][A-Za-z0-9_]{2,29}$/.test(val.trim()))
+        newErrors.username =
+          "Username must start with a letter or underscore and be 3-30 chars long";
+      else if (allUsernames.includes(val.trim()))
+        newErrors.username = "Username already exists";
+      else delete newErrors.username;
+      return newErrors;
+    });
+  };
+
+  const handleGenderChange = (e) => {
+    setGender(e.target.value);
+    setErrors((prev) => {
+      const newErrors = { ...prev };
+      if (!e.target.value) newErrors.gender = "Please select your gender";
+      else delete newErrors.gender;
+      return newErrors;
+    });
+  };
+
+  const handlePasswordChange = (e) => {
+    const val = e.target.value;
+    setPassword(val);
+    setErrors((prev) => {
+      const newErrors = { ...prev };
+      if (!val) newErrors.password = "Password is required";
+      else if (!/(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}/.test(val))
+        newErrors.password =
+          "Password must have 8+ chars with uppercase, lowercase & number";
+      else delete newErrors.password;
+
+      if (confirmPassword && val !== confirmPassword)
+        newErrors.confirmPassword = "Passwords do not match";
+      else if (confirmPassword)
+        delete newErrors.confirmPassword;
+
+      return newErrors;
+    });
+  };
+
+  const handleConfirmPasswordChange = (e) => {
+    const val = e.target.value;
+    setConfirmPassword(val);
+    setErrors((prev) => {
+      const newErrors = { ...prev };
+      if (!val) newErrors.confirmPassword = "Please confirm your password";
+      else if (password !== val) newErrors.confirmPassword = "Passwords do not match";
+      else delete newErrors.confirmPassword;
+      return newErrors;
+    });
   };
 
   return (
@@ -125,14 +193,11 @@ const Signup = () => {
             <div className="w-12 h-12 bg-secondary/10 rounded-xl flex items-center justify-center mx-auto mb-3">
               <FaUserPlus className="text-lg text-secondary" />
             </div>
-            <h1 className="text-2xl font-bold text-base-content mb-1">
-              Join Us
-            </h1>
+            <h1 className="text-2xl font-bold text-base-content mb-1">Join Us</h1>
             <p className="text-sm text-base-content/60">Create your account</p>
           </div>
 
-          <form className="space-y-4" onSubmit={handleSubmit}>
-            {/* Name Field */}
+          <form className="space-y-4" onSubmit={handleSubmit} noValidate>
             <div className="relative">
               <div className="absolute top-3 left-0 pl-3 pointer-events-none z-10">
                 <FaIdCard className="text-sm text-base-content/40" />
@@ -141,16 +206,20 @@ const Signup = () => {
                 type="text"
                 placeholder="Full Name"
                 value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full pl-10 pr-3 py-2.5 bg-base-200/50 border border-base-300/30 rounded-lg text-sm text-base-content placeholder:text-base-content/40 focus:outline-none focus:ring-1 focus:ring-secondary/50 focus:border-secondary/50 focus:bg-base-100 transition-all duration-200"
+                onChange={handleNameChange}
+                className={`w-full pl-10 pr-3 py-2.5 border rounded-lg text-sm placeholder:text-base-content/40 focus:outline-none transition-all duration-200 ${
+                  errors.name
+                    ? "border-red-600 text-red-600 focus:ring-red-600 focus:border-red-600"
+                    : "border-base-300/30 bg-base-200/50 focus:ring-secondary/50 focus:border-secondary/50 focus:bg-base-100"
+                }`}
                 disabled={isLoading}
+                autoComplete="name"
               />
-              {isNameInvalid && (
-                <p className="text-xs text-orange-500 mt-1 ml-1">Too short</p>
+              {errors.name && (
+                <p className="text-xs text-red-600 mt-1 ml-1">{errors.name}</p>
               )}
             </div>
 
-            {/* Username Field */}
             <div className="relative">
               <div className="absolute top-3 left-0 pl-3 pointer-events-none z-10">
                 <FaUser className="text-sm text-base-content/40" />
@@ -159,18 +228,58 @@ const Signup = () => {
                 type="text"
                 placeholder="Username"
                 value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="w-full pl-10 pr-3 py-2.5 bg-base-200/50 border border-base-300/30 rounded-lg text-sm text-base-content placeholder:text-base-content/40 focus:outline-none focus:ring-1 focus:ring-secondary/50 focus:border-secondary/50 focus:bg-base-100 transition-all duration-200"
+                onChange={handleUsernameChange}
+                className={`w-full pl-10 pr-3 py-2.5 border rounded-lg text-sm placeholder:text-base-content/40 focus:outline-none transition-all duration-200 ${
+                  errors.username
+                    ? "border-red-600 text-red-600 focus:ring-red-500 focus:border-red-600"
+                    : "border-base-300/30 bg-base-200/50 focus:ring-secondary/50 focus:border-secondary/50 focus:bg-base-100"
+                }`}
                 disabled={isLoading}
+                autoComplete="username"
               />
-              {isUsernameInvalid && (
-                <p className="text-xs text-orange-500 mt-1 ml-1">
-                  Invalid format
-                </p>
+              {errors.username && (
+                <p className="text-xs text-red-600 mt-1 ml-1">{errors.username}</p>
               )}
             </div>
 
-            {/* Password Field */}
+            <div className="flex gap-4 items-center justify-start px-2">
+              <label
+                className={`flex items-center gap-2 cursor-pointer ${
+                  errors.gender ? "text-red-600" : "text-base-content/70"
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="gender"
+                  value="male"
+                  checked={gender === "male"}
+                  onChange={handleGenderChange}
+                  disabled={isLoading}
+                  className="cursor-pointer"
+                />
+                Male
+              </label>
+              <label
+                className={`flex items-center gap-2 cursor-pointer ${
+                  errors.gender ? "text-red-600" : "text-base-content/70"
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="gender"
+                  value="female"
+                  checked={gender === "female"}
+                  onChange={handleGenderChange}
+                  disabled={isLoading}
+                  className="cursor-pointer"
+                />
+                Female
+              </label>
+            </div>
+            {errors.gender && (
+              <p className="text-xs text-red-600 mt-1 ml-1">{errors.gender}</p>
+            )}
+
             <div className="relative">
               <div className="absolute top-3 left-0 pl-3 pointer-events-none z-10">
                 <FaLock className="text-sm text-base-content/40" />
@@ -179,26 +288,29 @@ const Signup = () => {
                 type={showPassword ? "text" : "password"}
                 placeholder="Password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-10 pr-10 py-2.5 bg-base-200/50 border border-base-300/30 rounded-lg text-sm text-base-content placeholder:text-base-content/40 focus:outline-none focus:ring-1 focus:ring-secondary/50 focus:border-secondary/50 focus:bg-base-100 transition-all duration-200"
+                onChange={handlePasswordChange}
+                className={`w-full pl-10 pr-10 py-2.5 border rounded-lg text-sm placeholder:text-base-content/40 focus:outline-none transition-all duration-200 ${
+                  errors.password
+                    ? "border-red-600 text-red-600 focus:ring-red-600 focus:border-red-600"
+                    : "border-base-300/30 bg-base-200/50 focus:ring-secondary/50 focus:border-secondary/50 focus:bg-base-100"
+                }`}
                 disabled={isLoading}
+                autoComplete="new-password"
               />
               <button
                 type="button"
-                onClick={togglePassword}
+                onClick={() => setShowPassword((prev) => !prev)}
                 className="absolute top-3 right-0 pr-3 text-sm text-base-content/40 hover:text-base-content transition-colors z-10"
                 disabled={isLoading}
+                tabIndex={-1}
               >
                 {showPassword ? <FaEyeSlash /> : <FaEye />}
               </button>
-              {isPasswordInvalid && (
-                <p className="text-xs text-orange-500 mt-1 ml-1">
-                  Password: 8+ chars with uppercase, lowercase & number
-                </p>
+              {errors.password && (
+                <p className="text-xs text-red-600 mt-1 ml-1">{errors.password}</p>
               )}
             </div>
 
-            {/* Confirm Password Field */}
             <div className="relative">
               <div className="absolute top-3 left-0 pl-3 pointer-events-none z-10">
                 <FaLock className="text-sm text-base-content/40" />
@@ -207,24 +319,31 @@ const Signup = () => {
                 type={showConfirmPassword ? "text" : "password"}
                 placeholder="Confirm Password"
                 value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full pl-10 pr-10 py-2.5 bg-base-200/50 border border-base-300/30 rounded-lg text-sm text-base-content placeholder:text-base-content/40 focus:outline-none focus:ring-1 focus:ring-secondary/50 focus:border-secondary/50 focus:bg-base-100 transition-all duration-200"
+                onChange={handleConfirmPasswordChange}
+                className={`w-full pl-10 pr-10 py-2.5 border rounded-lg text-sm placeholder:text-base-content/40 focus:outline-none transition-all duration-200 ${
+                  errors.confirmPassword
+                    ? "border-red-600 text-red-600 focus:ring-red-600 focus:border-red-600"
+                    : "border-base-300/30 bg-base-200/50 focus:ring-secondary/50 focus:border-secondary/50 focus:bg-base-100"
+                }`}
                 disabled={isLoading}
+                autoComplete="new-password"
               />
               <button
                 type="button"
-                onClick={toggleConfirmPassword}
+                onClick={() => setShowConfirmPassword((prev) => !prev)}
                 className="absolute top-3 right-0 pr-3 text-sm text-base-content/40 hover:text-base-content transition-colors z-10"
                 disabled={isLoading}
+                tabIndex={-1}
               >
                 {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
               </button>
-              {isConfirmPasswordInvalid && (
-                <p className="text-xs text-orange-500 mt-1 ml-1">Don't match</p>
+              {errors.confirmPassword && (
+                <p className="text-xs text-red-600 mt-1 ml-1">
+                  {errors.confirmPassword}
+                </p>
               )}
             </div>
 
-            {/* Submit Button */}
             <button
               type="submit"
               disabled={isLoading}
@@ -240,7 +359,6 @@ const Signup = () => {
               )}
             </button>
 
-            {/* Divider */}
             <div className="relative my-4">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-base-300"></div>
@@ -252,7 +370,6 @@ const Signup = () => {
               </div>
             </div>
 
-            {/* Link to Login */}
             <a
               href="/login"
               className="w-full py-2.5 border border-secondary/20 hover:border-secondary/40 text-secondary font-medium rounded-lg transition-all duration-200 flex items-center justify-center hover:bg-secondary/5 text-sm"
@@ -262,17 +379,6 @@ const Signup = () => {
           </form>
         </div>
       </div>
-      <Toaster
-        position="top-center"
-        toastOptions={{
-          duration: 3000,
-          style: {
-            background: "var(--fallback-b1,oklch(var(--b1)))",
-            color: "var(--fallback-bc,oklch(var(--bc)))",
-            border: "1px solid var(--fallback-b3,oklch(var(--b3)))",
-          },
-        }}
-      />
     </div>
   );
 };

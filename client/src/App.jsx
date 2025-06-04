@@ -3,17 +3,28 @@ import { Routes, Route } from "react-router-dom";
 import Home from "./page/Home";
 import Login from "./page/authentication/Login";
 import Signup from "./page/authentication/Signup";
-import ThemeProvider from "./context/ThemeContext";
+import { Toaster } from "react-hot-toast";
 
 const App = () => {
   return (
-    <ThemeProvider>
+    <>
+   <Toaster
+        position="top-center"
+        toastOptions={{
+          duration: 2000,
+          style: {
+            background: "var(--fallback-b1,oklch(var(--b1)))",
+            color: "var(--fallback-bc,oklch(var(--bc)))",
+            border: "1px solid var(--fallback-b3,oklch(var(--b3)))",
+          },
+        }}
+      />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
       </Routes>
-    </ThemeProvider>
+    </>
   );
 };
 

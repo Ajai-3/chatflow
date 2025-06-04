@@ -1,76 +1,75 @@
 import React, { useState } from "react";
 import { FaUser, FaLock, FaEye, FaEyeSlash, FaSignInAlt } from "react-icons/fa";
-import toast, { Toaster } from "react-hot-toast";
+import { useDispatch } from "react-redux";
+import { loginUserThunk } from "../../store/slice/user.thunk";
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState({});
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const togglePassword = () => setShowPassword((prev) => !prev);
 
-  // Validation functions
-  const isUsernameEmpty = username.trim().length === 0;
-  const isPasswordEmpty = password.trim().length === 0;
+  const validateAll = () => {
+    const newErrors = {};
+    const trimmedUsername = username.trim();
+    const trimmedPassword = password.trim();
 
-  const isUsernameInvalid =
-    username.length > 0 &&
-    !/^[A-Za-z][A-Za-z0-9-]{2,29}$/.test(username.trim());
+    if (!trimmedUsername) newErrors.username = "Username is required";
+    if (!trimmedPassword) newErrors.password = "Password is required";
 
-  const isPasswordInvalid =
-    password.length > 0 &&
-    !/(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}/.test(password);
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleUsernameChange = (e) => {
+    setUsername(e.target.value);
+    setErrors((prev) => {
+      const newErrors = { ...prev };
+      if (!e.target.value.trim()) newErrors.username = "Username is required";
+      else delete newErrors.username;
+      return newErrors;
+    });
+  };
+
+  const handlePasswordChange = (e) => {
+    setPassword(e.target.value);
+    setErrors((prev) => {
+      const newErrors = { ...prev };
+      if (!e.target.value.trim()) newErrors.password = "Password is required";
+      else delete newErrors.password;
+      return newErrors;
+    });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Trim values
-    const trimmedUsername = username.trim();
-    const trimmedPassword = password.trim();
-
-    // Check for empty fields
-    if (isUsernameEmpty) {
-      toast.error("Username is required");
-      return;
-    }
-
-    if (isPasswordEmpty) {
-      toast.error("Password is required");
-      return;
-    }
-
-    // Check for invalid formats
-    if (!/^[A-Za-z][A-Za-z0-9-]{2,29}$/.test(trimmedUsername)) {
-      toast.error(
-        "Username must be 3-30 characters (letters, numbers, dashes only)"
-      );
-      return;
-    }
-
-    if (!/(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}/.test(trimmedPassword)) {
-      toast.error(
-        "Password: 8+ chars with uppercase, lowercase & number"
-      );
-      return;
-    }
+    if (!validateAll()) return;
 
     setIsLoading(true);
-
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      const resultAction = await dispatch(
+        loginUserThunk({ username: username.trim(), password: password.trim() })
+      );
 
-      // Success
-      toast.success("Login successful!");
-      console.log("Login data:", {
-        username: trimmedUsername,
-        password: trimmedPassword,
-      });
-
-      // Here you would typically redirect or update app state
-    } catch (error) {
-      toast.error("Login failed. Please try again.");
+      if (loginUserThunk.fulfilled.match(resultAction)) {
+        setPassword("");
+        setUsername("");
+        navigate("/");
+        toast.success("Login successfull.")
+      } else {
+        toast.error(resultAction.payload || "Login failed");
+      }
+    } catch {
+      setErrors({ server: "Login failed. Please try again." });
     } finally {
       setIsLoading(false);
     }
@@ -93,7 +92,6 @@ const Login = () => {
           </div>
 
           <form className="space-y-4" onSubmit={handleSubmit}>
-            {/* Username Field */}
             <div className="relative">
               <div className="absolute top-3 left-0 pl-3 pointer-events-none z-10">
                 <FaUser className="text-sm text-base-content/40" />
@@ -102,18 +100,19 @@ const Login = () => {
                 type="text"
                 placeholder="Username"
                 value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="w-full pl-10 pr-3 py-2.5 bg-base-200/50 border border-base-300/30 rounded-lg text-sm text-base-content placeholder:text-base-content/40 focus:outline-none focus:ring-1 focus:ring-primary/50 focus:border-primary/50 focus:bg-base-100 transition-all duration-200"
+                onChange={handleUsernameChange}
+                className={`w-full pl-10 pr-3 py-2.5 border rounded-lg text-sm placeholder:text-base-content/40 focus:outline-none transition-all duration-200 ${
+                  errors.username
+                    ? "border-red-600 text-red-600 focus:ring-red-600 focus:border-red-600"
+                    : "border-base-300/30 bg-base-200/50 focus:ring-primary/50 focus:border-primary/50 focus:bg-base-100"
+                }`}
                 disabled={isLoading}
               />
-              {isUsernameInvalid && (
-                <p className="text-xs text-orange-500 mt-1 ml-1">
-                  Invalid format
-                </p>
+              {errors.username && (
+                <p className="text-xs text-red-600 mt-1 ml-1">{errors.username}</p>
               )}
             </div>
 
-            {/* Password Field */}
             <div className="relative">
               <div className="absolute top-3 left-0 pl-3 pointer-events-none z-10">
                 <FaLock className="text-sm text-base-content/40" />
@@ -122,8 +121,12 @@ const Login = () => {
                 type={showPassword ? "text" : "password"}
                 placeholder="Password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-10 pr-10 py-2.5 bg-base-200/50 border border-base-300/30 rounded-lg text-sm text-base-content placeholder:text-base-content/40 focus:outline-none focus:ring-1 focus:ring-primary/50 focus:border-primary/50 focus:bg-base-100 transition-all duration-200"
+                onChange={handlePasswordChange}
+                className={`w-full pl-10 pr-10 py-2.5 border rounded-lg text-sm placeholder:text-base-content/40 focus:outline-none transition-all duration-200 ${
+                  errors.password
+                    ? "border-red-600 text-red-600 focus:ring-red-600 focus:border-red-600"
+                    : "border-base-300/30 bg-base-200/50 focus:ring-primary/50 focus:border-primary/50 focus:bg-base-100"
+                }`}
                 disabled={isLoading}
               />
               <button
@@ -134,14 +137,15 @@ const Login = () => {
               >
                 {showPassword ? <FaEyeSlash /> : <FaEye />}
               </button>
-              {isPasswordInvalid && (
-                <p className="text-xs text-orange-500 mt-1 ml-1">
-                  Password: 8+ chars with uppercase, lowercase & number
-                </p>
+              {errors.password && (
+                <p className="text-xs text-red-600 mt-1 ml-1">{errors.password}</p>
               )}
             </div>
 
-            {/* Submit Button */}
+            {errors.server && (
+              <p className="text-xs text-red-600 mt-1 ml-1">{errors.server}</p>
+            )}
+
             <button
               type="submit"
               disabled={isLoading}
@@ -157,7 +161,6 @@ const Login = () => {
               )}
             </button>
 
-            {/* Divider */}
             <div className="relative my-4">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-base-300"></div>
@@ -169,7 +172,6 @@ const Login = () => {
               </div>
             </div>
 
-            {/* Link to Signup */}
             <a
               href="/signup"
               className="w-full py-2.5 border border-primary/20 hover:border-primary/40 text-primary font-medium rounded-lg transition-all duration-200 flex items-center justify-center hover:bg-primary/5 text-sm"
@@ -179,17 +181,6 @@ const Login = () => {
           </form>
         </div>
       </div>
-      <Toaster
-        position="top-center"
-        toastOptions={{
-          duration: 3000,
-          style: {
-            background: "var(--fallback-b1,oklch(var(--b1)))",
-            color: "var(--fallback-bc,oklch(var(--bc)))",
-            border: "1px solid var(--fallback-b3,oklch(var(--b3)))",
-          },
-        }}
-      />
     </div>
   );
 };
