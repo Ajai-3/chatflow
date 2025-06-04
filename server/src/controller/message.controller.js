@@ -61,22 +61,22 @@ export const sendMessage = asyncHandler(async (req, res, next) => {
 // @USAGE   : Fetches the conversation and populates all messages between the two users.
 //=======================================================================================================================
 export const getMessages = asyncHandler(async (req, res, next) => {
-   const myId = req.user._id 
-   const otherParticipantId = req.params.otherParticipantId
-   
-   if (!myId || !otherParticipantId) {
-     return next(new errorHandler("All fields are required", 400))
-   }
+    const myId = req.user._id
+    const otherParticipantId = req.params.receiverId;
 
-   let conversation = await conversationModel.findOne({
-    participants: { $all: [myId, otherParticipantId] }
-   })
+    if (!myId || !otherParticipantId) {
+        return next(new errorHandler("All fields are required", 400))
+    }
 
+    let conversation = await conversationModel.findOne({
+        participants: { $all: [myId, otherParticipantId] }
+    }).populate({
+      path: "messages",
+    });
 
-
-   return res.status(200).json({
-    success: true,
-    responseData: conversation
-   })
+    return res.status(200).json({
+        success: true,
+        responseData: conversation
+    })
 
 })

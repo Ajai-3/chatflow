@@ -163,15 +163,13 @@ export const getChatUsers = asyncHandler(async (req, res, next) => {
         const lastMessage = conv.messages.length > 0 ? conv.messages[0] : null;
 
         results.push({
-            user: otherUser,
-            lastMessage: lastMessage
-                ? {
-                    text: lastMessage.message,
-                    createdAt: lastMessage.createdAt,
-                    senderId: lastMessage.senderId._id,
-                    isFromMe: lastMessage.senderId._id.toString() === userId.toString()
-                }
-                : null,
+            _id: otherUser._id,
+            fullname: otherUser.fullname,
+            username: otherUser.username,
+            avatar: otherUser.avatar,
+            lastMessage: lastMessage?.message || null,
+            time: lastMessage?.createdAt || null,
+            senderId: lastMessage?.senderId?._id || null,
         });
     });
 
