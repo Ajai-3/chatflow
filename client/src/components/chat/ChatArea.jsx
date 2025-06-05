@@ -4,20 +4,26 @@ import MessagesList from "./MessagesList";
 import MessageInput from "./MessageInput";
 import EmptyChat from "./EmptyChat";
 
-const ChatArea = ({ 
+const ChatArea = ({
   selectedUser,
-  messages, 
-  message, 
-  setMessage, 
-  handleSendMessage 
+  messages,
+  message,
+  setMessage,
+  handleSendMessage,
+  onBackToUsers,
+  isMobile = false,
 }) => {
   return (
-    <div className="flex-1 flex flex-col">
+    <div className="flex-1 flex flex-col h-full">
       {selectedUser ? (
         <>
-          <ChatHeader selectedUser={selectedUser} />
+          <ChatHeader
+            selectedUser={selectedUser}
+            onBackToUsers={onBackToUsers}
+            isMobile={isMobile}
+          />
           <MessagesList messages={messages} selectedUser={selectedUser} />
-          <MessageInput 
+          <MessageInput
             message={message}
             setMessage={setMessage}
             handleSendMessage={handleSendMessage}

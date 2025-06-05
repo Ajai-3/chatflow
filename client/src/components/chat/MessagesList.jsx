@@ -4,7 +4,7 @@ import { getMessageThunk } from "../../store/slice/message/message.thunk";
 
 const MessagesList = ({ messages, selectedUser }) => {
   const dispatch = useDispatch();
-  const user = useSelector((state) => state.user.user)
+  const user = useSelector((state) => state.user.user);
 
   useEffect(() => {
     if (selectedUser?._id) {
@@ -17,25 +17,29 @@ const MessagesList = ({ messages, selectedUser }) => {
       {messages?.map((msg) => (
         <div
           key={msg._id}
-          className={`flex ${msg.senderId === user._id ? "justify-end" : "justify-start"}`}
+          className={`flex ${
+            msg.senderId === user._id ? "justify-end" : "justify-start"
+          }`}
         >
           <div
-            className={`max-w-xs lg:max-w-md px-4 py-2 rounded-2xl ${
-              msg.isMine
-                ? "bg-primary text-primary-content"
-                : "bg-base-300 text-base-content"
+            className={`max-w-[80%] md:max-w-xs lg:max-w-md px-4 py-2.5 rounded-2xl ${
+              msg.senderId === user._id
+                ? "bg-primary text-primary-content rounded-br-md"
+                : "bg-base-300 text-base-content rounded-bl-md"
             }`}
           >
-            <p className="text-sm">{msg.message}</p>
+            <p className="text-sm break-words">{msg.message}</p>
             <p
               className={`text-xs mt-1 ${
-                msg.isMine ? "text-primary-content/70" : "text-base-content/60"
+                msg.senderId === user._id
+                  ? "text-primary-content/70"
+                  : "text-base-content/60"
               }`}
             >
               {new Date(msg.createdAt).toLocaleTimeString("en-US", {
                 hour: "2-digit",
                 minute: "2-digit",
-                hour12: true, 
+                hour12: true,
               })}
             </p>
           </div>
