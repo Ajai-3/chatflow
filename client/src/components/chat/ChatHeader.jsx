@@ -1,8 +1,10 @@
 import React from "react";
 import { FaCircle, FaPhone, FaVideo, FaEllipsisV } from "react-icons/fa";
+import { useSelector } from "react-redux";
 
 
 const ChatHeader = ({ selectedUser }) => {
+  const onlineUsers = useSelector((state) => state.socket.onlineUsers)
   return (
     <div className="p-4 border-b border-base-300 bg-base-100">
       <div className="flex items-center justify-between">
@@ -25,7 +27,7 @@ const ChatHeader = ({ selectedUser }) => {
           <div>
             <h2 className="font-semibold text-base-content">{selectedUser.fullname}</h2>
             <p className="text-sm text-base-content/60">
-              {selectedUser?.online ? "Online" : "Last seen recently"}
+              {onlineUsers?.includes(selectedUser?._id) ? "Online" : "Last seen recently"}
             </p>
           </div>
         </div>

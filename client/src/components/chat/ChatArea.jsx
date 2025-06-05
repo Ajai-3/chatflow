@@ -11,7 +11,6 @@ const ChatArea = ({
   setMessage, 
   handleSendMessage 
 }) => {
-// console.log(selectedUser)
   return (
     <div className="flex-1 flex flex-col">
       {selectedUser ? (

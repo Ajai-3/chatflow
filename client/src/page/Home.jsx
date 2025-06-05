@@ -7,21 +7,40 @@ import {
   getProfileThunk,
 } from "../store/slice/user/user.thunk";
 import { sendMessageThunk } from "../store/slice/message/message.thunk";
-import { initializeSocket } from "../store/slice/socket/socket.slice";
+import { initializeSocket, setOnlineUsers } from "../store/slice/socket/socket.slice";
+import EmojiPicker from 'emoji-picker-react';
+
+
 
 const Home = () => {
   const [message, setMessage] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
 
   const dispatch = useDispatch();
-  const { selectedUser, isAuthenticated} = useSelector((state) => state.user)
+  const { selectedUser, isAuthenticated, user} = useSelector((state) => state.user)
+  const { socket } = useSelector((state) => state.socket)
 
-  console.log(isAuthenticated)
-  
-  useEffect(() => {
-    if (!isAuthenticated) return
-    dispatch(initializeSocket())
-  }, [isAuthenticated])
+useEffect(() => {
+  if (user?._id) {
+    if (socket) socket.disconnect();
+    
+    dispatch(initializeSocket(user._id));
+  }
+}, [isAuthenticated, user?._id, dispatch]);
+
+ useEffect(() => {
+  if (!socket) return;
+
+  socket.on("onlineUsers", (onlineUsers) => {
+    console.log("Online users:", onlineUsers);
+    dispatch(setOnlineUsers(onlineUsers));
+  });
+
+  return () => {
+    socket.off("onlineUsers");
+  };
+}, [socket, dispatch]);
+
 
   useEffect(() => {
     dispatch(getProfileThunk());
@@ -47,6 +66,7 @@ const Home = () => {
 
   return (
     <div className="h-screen bg-base-100 flex">
+      {/* <EmojiPicker onEmojiClick={(e, emojiObject) => console.log(emojiObject)} /> */}
       <UsersList
         usersWithLastMessage={usersWithLastMessage}
         selectedUser={selectedUser}

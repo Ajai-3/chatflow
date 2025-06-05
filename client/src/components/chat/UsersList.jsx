@@ -1,11 +1,12 @@
 import React from "react";
 import { FaSearch, FaCircle, FaRocket } from "react-icons/fa";
 import ThemeSwitcher from "../ThemeSwitcher";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { logoutUserThunk } from "../../store/slice/user/user.thunk";
 import { setSelectUser } from "../../store/slice/user/user.slice";
+import { setOnlineUsers } from "../../store/slice/socket/socket.slice";
 
 const UsersList = ({
   selectedUser,
@@ -14,22 +15,22 @@ const UsersList = ({
   searchTerm,
   setSearchTerm,
 }) => {
-
-
-  const dispatch = useDispatch()
-  const navigate = useNavigate()
-
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { onlineUsers, socket } = useSelector((state) => state.socket);
 
   const handleLogout = async () => {
-    dispatch(logoutUserThunk())
-    toast.success("Logout successfull")
+    if (socket) {
+      socket.disconnect();
+    }
+    dispatch(logoutUserThunk());
+    toast.success("Logout successfull");
     navigate("/login");
-  }
+  };
 
   const handleSelectUser = (user) => {
-    dispatch(setSelectUser(user))
-  }
-
+    dispatch(setSelectUser(user));
+  };
 
   return (
     <div className="w-80 bg-base-200 border-r border-base-300 flex flex-col">
@@ -82,7 +83,7 @@ const UsersList = ({
                     }}
                   />
                 </div>
-                {user?.online && (
+                {onlineUsers?.includes(user?._id) && (
                   <FaCircle className="absolute -bottom-1 -right-1 text-green-500 text-xs bg-base-200 rounded-full" />
                 )}
               </div>
@@ -139,7 +140,12 @@ const UsersList = ({
           </div>
         </div>
         <div>
-          <button onClick={handleLogout} className="bg-red-600 px-2 py-1 rounded-2xl hover:bg-red-700 cursor-pointer">Logout</button>
+          <button
+            onClick={handleLogout}
+            className="bg-red-600 px-2 py-1 rounded-2xl hover:bg-red-700 cursor-pointer"
+          >
+            Logout
+          </button>
         </div>
       </div>
     </div>
