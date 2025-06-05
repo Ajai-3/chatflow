@@ -25,6 +25,8 @@ export const sendMessage = asyncHandler(async (req, res, next) => {
         participants: { $all: [senderId, receiverId] }
     });
 
+    console.log(conversation)
+
     if (!conversation) {
         conversation = await conversationModel.create({
             participants: [senderId, receiverId]

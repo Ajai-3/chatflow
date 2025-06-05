@@ -132,7 +132,7 @@ export const getProfile = asyncHandler(async (req, res, next) => {
 export const searchUser = asyncHandler(async (req, res, next) => {
     const userId = req.user?._id;
 
-    const { username } = req.body
+    const { username } = req.query
     if (!username) {
         return next(new errorHandler("User name required", 400));
     }
