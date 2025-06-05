@@ -7,13 +7,21 @@ import {
   getProfileThunk,
 } from "../store/slice/user/user.thunk";
 import { sendMessageThunk } from "../store/slice/message/message.thunk";
+import { initializeSocket } from "../store/slice/socket/socket.slice";
 
 const Home = () => {
   const [message, setMessage] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
 
   const dispatch = useDispatch();
-  const selectedUser = useSelector((state) => state.user.selectedUser)
+  const { selectedUser, isAuthenticated} = useSelector((state) => state.user)
+
+  console.log(isAuthenticated)
+  
+  useEffect(() => {
+    if (!isAuthenticated) return
+    dispatch(initializeSocket())
+  }, [isAuthenticated])
 
   useEffect(() => {
     dispatch(getProfileThunk());
