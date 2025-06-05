@@ -1,4 +1,4 @@
-import axiosInstance from "../../../api/axiosINstance";
+import axiosInstance from "../../../api/axiosInstance";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
 //=======================================================================================================================
