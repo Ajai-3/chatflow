@@ -25,8 +25,6 @@ export const sendMessage = asyncHandler(async (req, res, next) => {
         participants: { $all: [senderId, receiverId] }
     });
 
-    console.log(conversation)
-
     if (!conversation) {
         conversation = await conversationModel.create({
             participants: [senderId, receiverId]
@@ -75,7 +73,7 @@ export const getMessages = asyncHandler(async (req, res, next) => {
     let conversation = await conversationModel.findOne({
         participants: { $all: [myId, otherParticipantId] }
     }).populate({
-      path: "messages",
+        path: "messages",
     });
 
     return res.status(200).json({

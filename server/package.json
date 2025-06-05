@@ -1,16 +1,22 @@
 {
-  "name": "server",
+  "name": "chatflow-server",
   "version": "1.0.0",
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon src/server.js"
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js"
   },
-  "keywords": [],
+  "keywords": [
+    "chat",
+    "socket.io",
+    "real-time",
+    "messaging"
+  ],
   "type": "module",
-  "author": "",
-  "license": "ISC",
-  "description": "",
+  "author": "ChatFlow",
+  "license": "MIT",
+  "description": "ChatFlow - Real-time chat application server",
   "dependencies": {
     "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.7",

@@ -12,7 +12,6 @@ import { errorHandler } from '../utilities/errorHandler.utility.js';
 //=======================================================================================================================
 export const registerUser = asyncHandler(async (req, res, next) => {
     const { fullname, username, gender, password } = req.body;
-    console.log(req.body);
 
     if (!fullname || !username || !password) {
         return next(new errorHandler("All fields are required", 400));
@@ -125,7 +124,7 @@ export const getProfile = asyncHandler(async (req, res, next) => {
 });
 
 //=======================================================================================================================
-// GET USER WITH USER NAME 
+// GET USER WITH USER NAME
 //=======================================================================================================================
 // This controller is help to get theuser to search the users with user name
 //=======================================================================================================================
@@ -142,7 +141,7 @@ export const searchUser = asyncHandler(async (req, res, next) => {
     }
 
     const allUsers = await userModel.find({
-        username: { $regex: `^${username}`, $options: "i" }
+        username: { $regex: `^${username}`, $options: "i" }, _id: { $ne: userId }
     }).select("-password");
 
 
