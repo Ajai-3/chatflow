@@ -125,6 +125,39 @@ export const getProfile = asyncHandler(async (req, res, next) => {
 });
 
 //=======================================================================================================================
+// GET USER WITH USER NAME 
+//=======================================================================================================================
+// This controller is help to get theuser to search the users with user name
+//=======================================================================================================================
+export const searchUser = asyncHandler(async (req, res, next) => {
+    const userId = req.user?._id;
+
+    const { username } = req.body
+    if (!username) {
+        return next(new errorHandler("User name required", 400));
+    }
+
+    if (!userId) {
+        return next(new errorHandler("Unauthorized access", 401));
+    }
+
+    const allUsers = await userModel.find({
+        username: { $regex: `^${username}`, $options: "i" }
+    }).select("-password");
+
+
+    if (!allUsers) {
+        return next(new errorHandler("Users not found", 404));
+    }
+
+    return res.status(200).json({
+        success: true,
+        message: "User profile fetched successfully",
+        responseData: allUsers
+    });
+});
+
+//=======================================================================================================================
 // GET OTHER USERS
 //=======================================================================================================================
 // This controller is help to get other users
@@ -180,6 +213,8 @@ export const getChatUsers = asyncHandler(async (req, res, next) => {
         responseData: results,
     });
 });
+
+
 
 
 //=======================================================================================================================
