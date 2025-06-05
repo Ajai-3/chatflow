@@ -1,10 +1,13 @@
 import React from "react";
 import { FaCircle, FaPhone, FaVideo, FaEllipsisV } from "react-icons/fa";
 import { useSelector } from "react-redux";
-
+import useDateFormatter from "../../hook/useDateFormatter";
 
 const ChatHeader = ({ selectedUser }) => {
-  const onlineUsers = useSelector((state) => state.socket.onlineUsers)
+  const { formatDate } = useDateFormatter();
+  const onlineUsers = useSelector((state) => state.socket.onlineUsers);
+
+  console.log(selectedUser);
   return (
     <div className="p-4 border-b border-base-300 bg-base-100">
       <div className="flex items-center justify-between">
@@ -16,22 +19,30 @@ const ChatHeader = ({ selectedUser }) => {
                 alt={selectedUser.fullname}
                 className="w-full h-full object-cover"
                 onError={(e) => {
-                  e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedUser.name)}&background=random`;
+                  e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                    selectedUser.name
+                  )}&background=random`;
                 }}
               />
             </div>
-            {selectedUser?.online && (
+            {/* {selectedUser?.online && (
               <FaCircle className="absolute -bottom-1 -right-1 text-green-500 text-xs bg-base-100 rounded-full" />
-            )}
+            )} */}
           </div>
           <div>
-            <h2 className="font-semibold text-base-content">{selectedUser.fullname}</h2>
+            <h2 className="font-semibold text-base-content">
+              {selectedUser.fullname}
+            </h2>
             <p className="text-sm text-base-content/60">
-              {onlineUsers?.includes(selectedUser?._id) ? "Online" : "Last seen recently"}
+              {onlineUsers?.includes(selectedUser?._id)
+                ? "Online"
+                : selectedUser?.lastLogout
+                ? formatDate(selectedUser?.lastLogout) 
+                : "Last recent"}
             </p>
           </div>
         </div>
-        
+
         <div className="flex items-center gap-2">
           <button className="btn btn-ghost btn-circle btn-sm">
             <FaPhone />

@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { logoutUserThunk } from "../../store/slice/user/user.thunk";
 import { setSelectUser } from "../../store/slice/user/user.slice";
 import { setOnlineUsers } from "../../store/slice/socket/socket.slice";
+import useDateFormatter from "../../hook/useDateFormatter";
 
 const UsersList = ({
   selectedUser,
@@ -15,6 +16,7 @@ const UsersList = ({
   searchTerm,
   setSearchTerm,
 }) => {
+  const { formatDate } = useDateFormatter()
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { onlineUsers, socket } = useSelector((state) => state.socket);
@@ -94,7 +96,7 @@ const UsersList = ({
                     {user?.fullname}
                   </h3>
                   <span className="text-xs text-base-content/60">
-                    {user?.time}
+                    {formatDate(user?.time)}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
