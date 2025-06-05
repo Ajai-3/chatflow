@@ -32,12 +32,12 @@ const ChatHeader = ({ selectedUser, onBackToUsers, isMobile = false }) => {
           <div className="relative flex-shrink-0">
             <div className="w-10 h-10 rounded-full bg-base-300 overflow-hidden">
               <img
-                src={selectedUser.avatar}
-                alt={selectedUser.fullname}
+                src={selectedUser?.avatar}
+                alt={selectedUser?.fullname}
                 className="w-full h-full object-cover"
                 onError={(e) => {
                   e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                    selectedUser.fullname
+                    selectedUser?.fullname || "User"
                   )}&background=random`;
                 }}
               />
@@ -49,7 +49,7 @@ const ChatHeader = ({ selectedUser, onBackToUsers, isMobile = false }) => {
 
           <div className="min-w-0 flex-1">
             <h2 className="font-semibold text-base text-base-content truncate">
-              {selectedUser.fullname}
+              {selectedUser?.fullname}
             </h2>
             <p className="text-sm text-base-content/60 truncate">
               {onlineUsers?.includes(selectedUser?._id)

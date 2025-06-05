@@ -63,7 +63,7 @@ const UsersList = ({
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-xl font-bold text-primary flex items-center gap-2">
             <FaRocket />
-            MyApp Chat
+            ChatFlow
           </h1>
           <ThemeSwitcher />
         </div>
@@ -95,7 +95,7 @@ const UsersList = ({
       </div>
 
       {/* Users List */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto custom-scrollbar">
         {searchTerm.trim() && searchResults.length === 0 && !searchLoading ? (
           <div className="p-4 text-center text-base-content/60">
             <p>No users found matching "{searchTerm}"</p>

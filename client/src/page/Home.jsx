@@ -23,7 +23,17 @@ const Home = () => {
   const [message, setMessage] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [showMobileChat, setShowMobileChat] = useState(false);
+  const currentUser = useSelector((state) => state.user.user);
+  const usersWithLastMessage = useSelector((state) => state.user.chatUsers);
+  const searchResults = useSelector((state) => state.user.searchResults);
+  const searchLoading = useSelector((state) => state.user.searchLoading);
+
+  const messages = useSelector((state) => state.message.messages);
   const dispatch = useDispatch();
+  const { selectedUser, isAuthenticated, user } = useSelector(
+    (state) => state.user
+  );
+  const { socket } = useSelector((state) => state.socket);
 
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
@@ -36,11 +46,6 @@ const Home = () => {
 
     return () => clearTimeout(delayDebounce);
   }, [searchTerm, dispatch]);
-
-  const { selectedUser, isAuthenticated, user } = useSelector(
-    (state) => state.user
-  );
-  const { socket } = useSelector((state) => state.socket);
 
   useEffect(() => {
     if (user?._id) {
@@ -61,7 +66,7 @@ const Home = () => {
       dispatch(setNewMessage(newMessage));
 
       const senderId = newMessage.senderId;
-      if (senderId !== user._id) {
+      if (senderId !== user?._id) {
         let senderUser = usersWithLastMessage.find((u) => u._id === senderId);
 
         if (!senderUser) {
@@ -86,20 +91,14 @@ const Home = () => {
 
     return () => {
       socket.off("onlineUsers");
+      socket.off("newMessage");
     };
-  }, [socket, dispatch]);
+  }, [socket, dispatch, user?._id, usersWithLastMessage]);
 
   useEffect(() => {
     dispatch(getProfileThunk());
     dispatch(getChatUsersThunk());
   }, [dispatch]);
-
-  const currentUser = useSelector((state) => state.user.user);
-  const usersWithLastMessage = useSelector((state) => state.user.chatUsers);
-  const searchResults = useSelector((state) => state.user.searchResults);
-  const searchLoading = useSelector((state) => state.user.searchLoading);
-
-  const messages = useSelector((state) => state.message.messages);
 
   const handleSendMessage = (e) => {
     e.preventDefault();
@@ -121,7 +120,7 @@ const Home = () => {
           updateLastMessage({
             userId: selectedUser._id,
             message: message,
-            senderId: user._id,
+            senderId: user?._id,
           })
         );
       }
@@ -142,6 +141,15 @@ const Home = () => {
   const handleBackToUsers = () => {
     setShowMobileChat(false);
   };
+
+  // Show loading if user is not loaded yet
+  if (!user) {
+    return (
+      <div className="h-screen bg-base-100 flex items-center justify-center">
+        <div className="loading loading-spinner loading-lg"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-screen bg-base-100 flex">

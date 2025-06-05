@@ -9,7 +9,7 @@ const EmptyChat = () => {
           <FaRocket className="text-5xl text-base-content/40" />
         </div>
         <h2 className="text-2xl font-bold text-base-content mb-2">
-          Welcome to MyApp Chat
+          Welcome to ChatFlow
         </h2>
         <p className="text-base text-base-content/60 mb-4">
           Select a conversation to start messaging

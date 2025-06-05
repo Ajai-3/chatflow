@@ -21,7 +21,6 @@ const ChatArea = ({
   const emojiPickerRef = useRef(null);
 
   const handleEmojiClick = (emojiData) => {
-    console.log(emojiData.emoji);
     setMessage((prevMessage) => prevMessage + emojiData.emoji);
   };
 
