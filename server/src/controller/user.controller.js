@@ -139,12 +139,12 @@ export const getChatUsers = asyncHandler(async (req, res, next) => {
 
     const conversations = await conversationModel
         .find({ participants: userId })
-        .populate("participants", "_id fullname username avatar")
+        .populate("participants", "_id fullname username avatar lastLogout")
         .populate({
             path: "messages",
             populate: [
-                { path: "senderId", select: "username avatar" },
-                { path: "receiverId", select: "username avatar" }
+                { path: "senderId", select: "username avatar lastLogout" },
+                { path: "receiverId", select: "username avatar lastLogout" }
             ],
             options: { sort: { createdAt: -1 } }
         });
@@ -167,6 +167,7 @@ export const getChatUsers = asyncHandler(async (req, res, next) => {
             fullname: otherUser.fullname,
             username: otherUser.username,
             avatar: otherUser.avatar,
+            lastLogout: otherUser.lastLogout,
             lastMessage: lastMessage?.message || null,
             time: lastMessage?.createdAt || null,
             senderId: lastMessage?.senderId?._id || null,
@@ -187,6 +188,26 @@ export const getChatUsers = asyncHandler(async (req, res, next) => {
 // This controller is help the user to logout if  user is logined
 //=======================================================================================================================
 export const logout = asyncHandler(async (req, res, next) => {
+
+    const user = req.user?._id;
+    if (!user) {
+        return res.status(400).json({
+            success: false,
+            message: "No user found"
+        });
+    }
+    const existingUser = await userModel.findById(user);
+
+    if (!existingUser) {
+        return res.status(404).json({
+            success: false,
+            message: "User not found"
+        });
+    }
+
+    existingUser.lastLogout = new Date();
+
+    await existingUser.save();
     return res
         .status(200)
         .clearCookie("token", {
