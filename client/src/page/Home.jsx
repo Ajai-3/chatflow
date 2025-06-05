@@ -5,7 +5,9 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   getChatUsersThunk,
   getProfileThunk,
+  searchUserThunk,
 } from "../store/slice/user/user.thunk";
+import { clearSearchResults } from "../store/slice/user/user.slice";
 import { sendMessageThunk } from "../store/slice/message/message.thunk";
 import {
   initializeSocket,
@@ -18,8 +20,20 @@ const Home = () => {
   const [message, setMessage] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [showMobileChat, setShowMobileChat] = useState(false);
-
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    const delayDebounce = setTimeout(() => {
+      if (searchTerm?.trim()) {
+        dispatch(searchUserThunk({ username: searchTerm }));
+      } else {
+        dispatch(clearSearchResults());
+      }
+    }, 500);
+
+    return () => clearTimeout(delayDebounce);
+  }, [searchTerm, dispatch]);
+
   const { selectedUser, isAuthenticated, user } = useSelector(
     (state) => state.user
   );
@@ -41,8 +55,8 @@ const Home = () => {
     });
 
     socket.on("newMessage", (newMessage) => {
-      dispatch(setNewMessage(newMessage))
-    })
+      dispatch(setNewMessage(newMessage));
+    });
 
     return () => {
       socket.off("onlineUsers");
@@ -56,14 +70,19 @@ const Home = () => {
 
   const currentUser = useSelector((state) => state.user.user);
   const usersWithLastMessage = useSelector((state) => state.user.chatUsers);
+  const searchResults = useSelector((state) => state.user.searchResults);
+  const searchLoading = useSelector((state) => state.user.searchLoading);
 
   const messages = useSelector((state) => state.message.messages);
 
   const handleSendMessage = (e) => {
     e.preventDefault();
 
+    console.log(usersWithLastMessage)
+
     if (message.trim() && selectedUser) {
       let receiverId = selectedUser._id;
+
       dispatch(sendMessageThunk({ receiverId, message }));
       setMessage("");
     }
@@ -93,6 +112,8 @@ const Home = () => {
             searchTerm={searchTerm}
             setSearchTerm={setSearchTerm}
             setShowMobileChat={setShowMobileChat}
+            searchResults={searchResults}
+            searchLoading={searchLoading}
           />
         ) : (
           <ChatArea
@@ -117,6 +138,8 @@ const Home = () => {
             currentUser={currentUser}
             searchTerm={searchTerm}
             setSearchTerm={setSearchTerm}
+            searchResults={searchResults}
+            searchLoading={searchLoading}
           />
         </div>
 

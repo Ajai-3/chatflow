@@ -1,14 +1,16 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { loginUserThunk, signupUserThunk, logoutUserThunk, getProfileThunk, getChatUsersThunk } from "./user.thunk";
+import { loginUserThunk, signupUserThunk, logoutUserThunk, getProfileThunk, getChatUsersThunk, searchUserThunk } from "./user.thunk";
 
 const initialState = {
   isAuthenticated: false,
   user: null,
   chatUsers: [],
+  searchResults: [],
   loading: false,
   selectedUser: null,
   screenLoading: true,
   chatUsersLoading: false,
+  searchLoading: false,
   error: null,
 };
 
@@ -16,9 +18,12 @@ export const userSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
-     setSelectUser: (state, action) => {
-        state.selectedUser = action.payload
-     }
+    setSelectUser: (state, action) => {
+      state.selectedUser = action.payload
+    },
+    clearSearchResults: (state) => {
+      state.searchResults = []
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -93,10 +98,24 @@ export const userSlice = createSlice({
       .addCase(getChatUsersThunk.rejected, (state, action) => {
         state.chatUsersLoading = false;
         state.error = action.payload || "Failed to load chat users";
+      })
+
+      .addCase(searchUserThunk.pending, (state) => {
+        state.searchLoading = true;
+        state.error = null;
+      })
+      .addCase(searchUserThunk.fulfilled, (state, action) => {
+        state.searchLoading = false;
+        state.searchResults = action.payload;
+        state.error = null;
+      })
+      .addCase(searchUserThunk.rejected, (state, action) => {
+        state.searchLoading = false;
+        state.error = action.payload || "Failed to search users";
       });
   }
 
 });
 
-export const { setSelectUser } = userSlice.actions;
+export const { setSelectUser, clearSearchResults } = userSlice.actions;
 export default userSlice.reducer;

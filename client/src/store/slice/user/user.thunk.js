@@ -121,6 +121,32 @@ export const getChatUsersThunk = createAsyncThunk(
 );
 
 //=======================================================================================================================
+// SEARCH USER 
+//=======================================================================================================================
+// Handles fetching the users with their user name 
+//=======================================================================================================================
+export const searchUserThunk = createAsyncThunk(
+  "user/search",
+  async ({ username }, { rejectWithValue }) => {
+    try {
+
+      const response = await axiosInstance.get(`/user/search?username=${username}`);
+
+      console.log(response.data)
+      return response.data.responseData;
+    } catch (error) {
+      console.log(error?.response?.data?.errMessage);
+      const message =
+        error.response?.data?.errMessage ||
+        error.response?.data?.message ||
+        "Failed to load chat users";
+      return rejectWithValue(message);
+    }
+  }
+);
+
+
+//=======================================================================================================================
 //  LOG OUT USRE
 //=======================================================================================================================
 // Handles user logout if the user logined

@@ -24,7 +24,8 @@ export const messageSlice = createSlice({
           state.error = null;
         })
         .addCase(sendMessageThunk.fulfilled, (state, action) => {
-          state.messages = [...state.messages, action.payload?.newMessage]
+          const oldMessages = state.messages ?? [];
+          state.messages = [...oldMessages, action.payload?.newMessage]
           state.buttonLoading = false;
           state.error = null;
         })
