@@ -23,6 +23,35 @@ export const userSlice = createSlice({
     },
     clearSearchResults: (state) => {
       state.searchResults = []
+    },
+    addUserToChatList: (state, action) => {
+      const newUser = action.payload;
+      const existingUser = state.chatUsers.find(user => user._id === newUser._id);
+      if (!existingUser) {
+        state.chatUsers.unshift({
+          _id: newUser._id,
+          fullname: newUser.fullname,
+          username: newUser.username,
+          avatar: newUser.avatar,
+          lastLogout: newUser.lastLogout,
+          lastMessage: null,
+          time: new Date().toISOString(),
+          senderId: null,
+        });
+      }
+    },
+    updateLastMessage: (state, action) => {
+      const { userId, message, senderId } = action.payload;
+      const userIndex = state.chatUsers.findIndex(user => user._id === userId);
+      if (userIndex !== -1) {
+        const user = state.chatUsers[userIndex];
+        user.lastMessage = message;
+        user.time = new Date().toISOString();
+        user.senderId = senderId;
+
+        state.chatUsers.splice(userIndex, 1);
+        state.chatUsers.unshift(user);
+      }
     }
   },
   extraReducers: (builder) => {
@@ -117,5 +146,5 @@ export const userSlice = createSlice({
 
 });
 
-export const { setSelectUser, clearSearchResults } = userSlice.actions;
+export const { setSelectUser, clearSearchResults, addUserToChatList, updateLastMessage } = userSlice.actions;
 export default userSlice.reducer;

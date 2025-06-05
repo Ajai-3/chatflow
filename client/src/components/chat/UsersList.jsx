@@ -11,8 +11,10 @@ import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { logoutUserThunk } from "../../store/slice/user/user.thunk";
-import { setSelectUser } from "../../store/slice/user/user.slice";
-import { setOnlineUsers } from "../../store/slice/socket/socket.slice";
+import {
+  setSelectUser,
+  clearSearchResults,
+} from "../../store/slice/user/user.slice";
 import useDateFormatter from "../../hook/useDateFormatter";
 
 const UsersList = ({
@@ -41,12 +43,17 @@ const UsersList = ({
 
   const handleSelectUser = (user) => {
     dispatch(setSelectUser(user));
+
+    if (searchTerm.trim()) {
+      setSearchTerm("");
+      dispatch(clearSearchResults());
+    }
+
     if (setShowMobileChat) {
       setShowMobileChat(true);
     }
   };
 
-  // Determine which users to display
   const displayUsers = searchTerm.trim() ? searchResults : usersWithLastMessage;
 
   return (

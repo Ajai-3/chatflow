@@ -7,13 +7,16 @@ import {
   getProfileThunk,
   searchUserThunk,
 } from "../store/slice/user/user.thunk";
-import { clearSearchResults } from "../store/slice/user/user.slice";
+import {
+  clearSearchResults,
+  addUserToChatList,
+  updateLastMessage,
+} from "../store/slice/user/user.slice";
 import { sendMessageThunk } from "../store/slice/message/message.thunk";
 import {
   initializeSocket,
   setOnlineUsers,
 } from "../store/slice/socket/socket.slice";
-import EmojiPicker from "emoji-picker-react";
 import { setNewMessage } from "../store/slice/message/message.slice";
 
 const Home = () => {
@@ -56,6 +59,29 @@ const Home = () => {
 
     socket.on("newMessage", (newMessage) => {
       dispatch(setNewMessage(newMessage));
+
+      const senderId = newMessage.senderId;
+      if (senderId !== user._id) {
+        let senderUser = usersWithLastMessage.find((u) => u._id === senderId);
+
+        if (!senderUser) {
+          dispatch(
+            updateLastMessage({
+              userId: senderId,
+              message: newMessage.message,
+              senderId: senderId,
+            })
+          );
+        } else {
+          dispatch(
+            updateLastMessage({
+              userId: senderId,
+              message: newMessage.message,
+              senderId: senderId,
+            })
+          );
+        }
+      }
     });
 
     return () => {
@@ -78,10 +104,27 @@ const Home = () => {
   const handleSendMessage = (e) => {
     e.preventDefault();
 
-    console.log(usersWithLastMessage)
-
     if (message.trim() && selectedUser) {
       let receiverId = selectedUser._id;
+
+      // Check if this user is already in chat list
+      const existingUser = usersWithLastMessage.find(
+        (user) => user._id === selectedUser._id
+      );
+
+      // If user is not in chat list (new conversation), add them
+      if (!existingUser) {
+        dispatch(addUserToChatList(selectedUser));
+      } else {
+        // Update last message for existing user
+        dispatch(
+          updateLastMessage({
+            userId: selectedUser._id,
+            message: message,
+            senderId: user._id,
+          })
+        );
+      }
 
       dispatch(sendMessageThunk({ receiverId, message }));
       setMessage("");

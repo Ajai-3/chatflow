@@ -1,7 +1,12 @@
 import React from "react";
 import { FaPaperPlane, FaSmile, FaPaperclip } from "react-icons/fa";
 
-const MessageInput = ({ message, setMessage, handleSendMessage }) => {
+const MessageInput = ({
+  message,
+  setMessage,
+  handleEmojiBUttonClick,
+  handleSendMessage,
+}) => {
   return (
     <div className="p-4 border-t border-base-300 bg-base-100">
       <form onSubmit={handleSendMessage} className="flex items-center gap-2">
@@ -23,10 +28,11 @@ const MessageInput = ({ message, setMessage, handleSendMessage }) => {
           />
           <button
             type="button"
+            onClick={handleEmojiBUttonClick}
             className="absolute right-3 top-1/2 transform -translate-y-1/2 text-base-content/40 hover:text-base-content transition-colors"
             aria-label="Add emoji"
           >
-            <FaSmile />
+            <FaSmile className="text-3xl" />
           </button>
         </div>
 
