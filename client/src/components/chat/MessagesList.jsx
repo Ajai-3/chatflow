@@ -1,10 +1,13 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getMessageThunk } from "../../store/slice/message/message.thunk";
+import { useRef } from "react";
 
 const MessagesList = ({ messages, selectedUser }) => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user.user);
+
+  const messageRef = useRef(null)
 
   useEffect(() => {
     if (selectedUser?._id) {
@@ -12,11 +15,18 @@ const MessagesList = ({ messages, selectedUser }) => {
     }
   }, [selectedUser]);
 
+  useEffect(() => {
+    if(messageRef.current) {
+      messageRef.current.scrollIntoView({ behavior: 'smooth' })
+    }
+  }, [messages])
+
   return (
     <div className="flex-1 overflow-y-auto p-4 space-y-4">
-      {messages?.map((msg) => (
+      {messages?.map((msg, index) => (
         <div
           key={msg._id}
+          ref={index === messages.length - 1 ? messageRef : null}
           className={`flex ${
             msg.senderId === user._id ? "justify-end" : "justify-start"
           }`}

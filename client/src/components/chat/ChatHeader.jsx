@@ -14,7 +14,6 @@ const ChatHeader = ({ selectedUser, onBackToUsers, isMobile = false }) => {
   const { formatDate } = useDateFormatter();
   const onlineUsers = useSelector((state) => state.socket.onlineUsers);
 
-  console.log(selectedUser);
   return (
     <div className="p-4 border-b border-base-300 bg-base-100">
       <div className="flex items-center justify-between">

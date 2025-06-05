@@ -12,6 +12,7 @@ import {
   setOnlineUsers,
 } from "../store/slice/socket/socket.slice";
 import EmojiPicker from "emoji-picker-react";
+import { setNewMessage } from "../store/slice/message/message.slice";
 
 const Home = () => {
   const [message, setMessage] = useState("");
@@ -36,9 +37,12 @@ const Home = () => {
     if (!socket) return;
 
     socket.on("onlineUsers", (onlineUsers) => {
-      console.log("Online users:", onlineUsers);
       dispatch(setOnlineUsers(onlineUsers));
     });
+
+    socket.on("newMessage", (newMessage) => {
+      dispatch(setNewMessage(newMessage))
+    })
 
     return () => {
       socket.off("onlineUsers");
@@ -57,17 +61,10 @@ const Home = () => {
 
   const handleSendMessage = (e) => {
     e.preventDefault();
-    console.log(selectedUser._id);
 
     if (message.trim() && selectedUser) {
       let receiverId = selectedUser._id;
       dispatch(sendMessageThunk({ receiverId, message }));
-      console.log(
-        "Sending message:",
-        message,
-        "to user:",
-        selectedUser.fullname
-      );
       setMessage("");
     }
   };
