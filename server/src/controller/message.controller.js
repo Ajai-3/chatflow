@@ -2,7 +2,7 @@ import messageModel from "../models/message.model.js"
 import conversationModel from "../models/conversation.model.js"
 import asyncHandler from "../utilities/asyncHandler.utility.js"
 import { errorHandler } from "../utilities/errorHandler.utility.js"
-import { response } from "express";
+import { getSocketId, io } from "../socket/socket.js"
 
 //=======================================================================================================================
 // SEND MESSAGE CONTROLLER
@@ -42,7 +42,9 @@ export const sendMessage = asyncHandler(async (req, res, next) => {
         await conversation.save();
     }
 
-    // You can emit message via Socket.io here (if integrated)
+    const soketId = getSocketId(receiverId)
+    io.to(soketId).emit("newMessage", newMessage)
+
 
     return res.status(200).json({
         success: true,
